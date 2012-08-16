@@ -36,6 +36,8 @@ mod.AreaForecast = [ '$scope', 'forecasts'
   dayOrNight = (h) -> (if h >= 18 || h <= 3 then 'night' else 'day')
 
   s.windIcon = (windlevel) -> if windlevel >= 3 then \circle-arrow-up else \arrow-up
+  s.getWindStyle = (windlevel) -> do
+      opacity: if windlevel <= 1 then 0.3 else if windlevel < 3 then 0.6 else 1
   s.getWeatherStyle = (t,f) ->
       [,icon] = f.WeatherIcon.match /Weather(\d+).bmp/;
       what = dayOrNight(s.getTime t)
