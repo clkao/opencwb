@@ -34,6 +34,10 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
         refresh: (area) ->
             forecasts.all[area.zip]dirty = true
             forecasts.addForecast area
+        remove: (area) ->
+            console.log \removing, area.zip
+            delete forecasts._current[area.zip]
+            forecasts.current .= filter -> it.zip != area.zip
         isStarred: (zip) ->
             if forecasts.starred[zip] then 'icon-star' else 'icon-star-empty'
         toggleStarred: (zip) ->

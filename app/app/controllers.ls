@@ -56,6 +56,7 @@ mod.AreaForecast = [ '$scope', 'forecasts'
   s.toggleStarred = forecasts.toggleStarred
   s.resetAll = forecasts.resetAll
   s.refresh = forecasts.refresh
+  s.remove = forecasts.remove
 
   (,,...[areas]) <- s.$on \xarea-changed
   for a in areas
