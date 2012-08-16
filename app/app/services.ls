@@ -36,7 +36,7 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
             forecasts._current = {[zip,f] for zip,f of forecasts.current}
         init: (areas) ->
             config <- store.get 'starred'
-            forecasts.starred = config.starred || {}
+            forecasts.starred = config?starred || {}
             for a in areas when forecasts.starred[a.zip] => forecasts.addForecast a
 
     }
