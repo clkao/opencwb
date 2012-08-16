@@ -9,7 +9,8 @@
     "url": "https://github.com/clkao/opencwb"
   },
   "engines": {
-    "node": "~0.6.10 || 0.8 || 0.9"
+    "node": "0.8.x",
+    "npm": "1.1.x"
   },
   "scripts": {
   },
