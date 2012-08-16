@@ -25,7 +25,7 @@
 
     "javascript-brunch": ">= 1.0 < 1.5",
     "coffee-script-brunch": ">= 1.0 < 1.5",
-    "LiveScript-brunch": ">= 1.0 < 1.5",
+    "LiveScript-brunch": ">= 1.4.1",
 
     "css-brunch": ">= 1.0 < 1.5",
     "less-brunch": "git+ssh://git@github.com:mlamby/less-brunch.git",
