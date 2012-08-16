@@ -25,8 +25,6 @@ _ = require \underscore
         @last = last.time
 
     sendFile = (file) -> ->
-        console.log file
-        console.log RealBin
         @response.contentType \text/html
         @response.sendfile "#RealBin/_public/#file"
 
@@ -37,8 +35,6 @@ _ = require \underscore
             .sort \time
             .exec (err, results) ->
                 cb err, [ {area,issued,time,forecast} for {area,issued,time,forecast} in results]
-#                console.log results[0]
-#                cb err, results.map ({time,forecast}) -> {} <<< forecast <<< { time }
 
     get_area = (cb) ~>
         cb null, _.values cwb.cwbspec
