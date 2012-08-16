@@ -44,14 +44,15 @@ mod.AreaForecast = [ '$scope', 'forecasts'
       res = \forecast-slot- + dayOrNight(h)
       res += ' forecast-slot-sep' if h === 0
       res
-  s.getDateCols = (f) ->
+  s.getDateCols = ({f}:area) ->
       return [] unless f?
-      f.dateCols ||= for {time},i in f when i === 0 || new Date(time)getHours! === 0 then do
+      area.dateCols ||= for {time},i in f when i === 0 || new Date(time)getHours! === 0 then do
           date: s.getDate(time)
           cols: (24 - new Date(time)getHours!) / 3
   s.isStarred = forecasts.isStarred
   s.toggleStarred = forecasts.toggleStarred
   s.resetAll = forecasts.resetAll
+  s.refresh = forecasts.refresh
 
   (,,...[areas]) <- s.$on \xarea-changed
   for a in areas

@@ -12,19 +12,26 @@ mod.store = ->
     }, -> it
 
 mod.forecasts = ['$http', 'store', ($http, store) ->
+    var splicer
     forecasts = {
         current: []
         _current: {}
         starred: {}
         all: {}
         addForecast: (area) -> 
-            unless forecasts.all[area.zip]
-                forecasts.all[area.zip] = {} <<< area;
+            if !forecasts.all[area.zip] || forecasts.all[area.zip]dirty
+                forecasts.all[area.zip] ||= {} <<< area;
                 $http.get("/1/forecast/#{area.zip}").success ->
                     forecasts.all[area.zip] = forecasts.all[area.zip] <<< forecasts: it
+                    delete forecasts.all[area.zip]['dirty']
+                    delete forecasts.all[area.zip]['dateCols']
+
             unless forecasts._current[area.zip]
                 forecasts.current.push(forecasts._current[area.zip] = forecasts.all[area.zip])
 
+        refresh: (area) ->
+            forecasts.all[area.zip]dirty = true
+            forecasts.addForecast area
         isStarred: (zip) ->
             if forecasts.starred[zip] then 'icon-star' else 'icon-star-empty'
         toggleStarred: (zip) ->
@@ -38,8 +45,23 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
             config <- store.get 'starred'
             forecasts.starred = config?starred || {}
             for a in areas when forecasts.starred[a.zip] => forecasts.addForecast a
-
     }
+
+    splicer = ->
+        now = new Date!
+        for zip,{forecasts:f}:area of forecasts.all => let f, area
+            if new Date(f[0].time).getTime! < now.getTime! - 2400 * 3000
+                f.shift!
+                area.dateCols = null
+
+    runner = (delay) ->
+        setTimeout ->
+            splicer!
+            runner!
+        , 1000 * (delay ? 1800)
+
+    runner (15 - new Date!getMinutes!) %% 60 * 60
+
     forecasts
 ]
 
