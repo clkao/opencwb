@@ -17,6 +17,7 @@
   "dependencies": {
     "zappajs": "0.3.x",
     "mongoose": "*",
+    "underscore": "*",
     "cwbtw": "git://github.com/clkao/cwbtw.git"
   },
   "devDependencies": {
