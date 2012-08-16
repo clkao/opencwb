@@ -60,6 +60,12 @@ mod.AreaForecast = [ '$scope', 'forecasts'
   s.refresh = forecasts.refresh
   s.remove = forecasts.remove
 
+  if navigator.geolocation
+    {{latitude,longitude}:coords} <- navigator.geolocation.getCurrentPosition
+    geocoder = new google.maps.Geocoder();
+    result, status <- geocoder.geocode {latLng: new google.maps.LatLng latitude,longitude } 
+    forecasts.setCurrent result[3]address_components[0]short_name
+
   (,,...[areas]) <- s.$on \xarea-changed
   for a in areas
       forecasts.addForecast a

@@ -21,7 +21,7 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
         addForecast: (area) -> 
             if !forecasts.all[area.zip] || forecasts.all[area.zip]dirty
                 forecasts.all[area.zip] ||= {} <<< area;
-                forecasts.all[area.zip]loading = \loading
+                forecasts.all[area.zip]loading = true
                 $http.get("/1/forecast/#{area.zip}").success ->
                     forecasts.all[area.zip] = forecasts.all[area.zip] <<< forecasts: it
                     forecasts.all[area.zip]loading = null
@@ -31,6 +31,12 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
             unless forecasts._current[area.zip]
                 forecasts.current.push(forecasts._current[area.zip] = forecasts.all[area.zip])
 
+        setCurrent: (zip) ->
+            [a] = [a for a in forecasts.areas when zip is a.zip]
+            return unless a
+            console.log a
+            forecasts.addForecast a
+            forecasts.all[zip]geoCurrent = true
         refresh: (area) ->
             forecasts.all[area.zip]dirty = true
             forecasts.addForecast area
@@ -50,6 +56,7 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
             config <- store.get 'starred'
             forecasts.starred = config?starred || {}
             for a in areas when forecasts.starred[a.zip] => forecasts.addForecast a
+            forecasts.areas = areas
     }
 
     splicer = ->
