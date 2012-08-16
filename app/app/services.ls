@@ -7,7 +7,8 @@ mod.version = -> "0.1"
 
 mod.store = ->
     new Lawnchair {
-      name: \starred
+        adapter: \dom
+        name: \starred
     }, -> it
 
 mod.forecasts = ['$http', 'store', ($http, store) ->
