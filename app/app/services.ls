@@ -23,8 +23,8 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
                 forecasts.all[area.zip] ||= {} <<< area;
                 $http.get("/1/forecast/#{area.zip}").success ->
                     forecasts.all[area.zip] = forecasts.all[area.zip] <<< forecasts: it
+                    delete forecasts.all[area.zip]['dateCols'] if forecasts.all[area.zip]dirty
                     delete forecasts.all[area.zip]['dirty']
-                    delete forecasts.all[area.zip]['dateCols']
 
             unless forecasts._current[area.zip]
                 forecasts.current.push(forecasts._current[area.zip] = forecasts.all[area.zip])
@@ -38,7 +38,6 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
             forecasts.starred[zip] = !forecasts.starred[zip]
             store.save {key: \starred, starred: forecasts.starred}
         resetAll: ->
-            console.log forecasts.starred
             forecasts.current = [forecasts.all[zip] for zip of forecasts.starred]
             forecasts._current = {[zip,f] for zip,f of forecasts.current}
         init: (areas) ->

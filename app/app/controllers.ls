@@ -44,11 +44,12 @@ mod.AreaForecast = [ '$scope', 'forecasts'
       res = \forecast-slot- + dayOrNight(h)
       res += ' forecast-slot-sep' if h === 0
       res
-  s.getDateCols = ({f}:area) ->
+  s.getDateCols = ({forecasts:f}:area) ->
       return [] unless f?
       area.dateCols ||= for {time},i in f when i === 0 || new Date(time)getHours! === 0 then do
           date: s.getDate(time)
           cols: (24 - new Date(time)getHours!) / 3
+      area.dateCols
   s.isStarred = forecasts.isStarred
   s.toggleStarred = forecasts.toggleStarred
   s.resetAll = forecasts.resetAll
