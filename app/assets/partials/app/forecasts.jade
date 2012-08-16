@@ -21,7 +21,7 @@ section.area-forecast(ng-controller='AreaForecast')
       .forecast-slot(ng-repeat='f in area.forecasts',ng-class='getDayOrNight(f.time)')
           .clear
             {{getTime(f.time)}}
-          span.icon-cwb-weather(ng-style="getWeatherStyle(f.time, f.forecast)")
+          span.icon-cwb-weather(ng-style="getWeatherStyle(f.time, f.forecast)",title='{{f.forecast.Wx}}')
           div.clear.temp
             {{f.forecast.Temperature}}
           div.clear.pop
@@ -29,4 +29,3 @@ section.area-forecast(ng-controller='AreaForecast')
           i(class='icon-{{windIcon(f.forecast.WindLevel)}} icon-wind icon-wind-{{f.forecast.WindDir}}',title='{{f.forecast.WindDir}}')
           div.clear.windlevel
             {{f.forecast.WindLevel}}
-          i.icon-info-sign(title='{{f.forecast.Wx}}')
