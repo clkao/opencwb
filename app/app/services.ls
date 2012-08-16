@@ -21,8 +21,10 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
         addForecast: (area) -> 
             if !forecasts.all[area.zip] || forecasts.all[area.zip]dirty
                 forecasts.all[area.zip] ||= {} <<< area;
+                forecasts.all[area.zip]loading = \loading
                 $http.get("/1/forecast/#{area.zip}").success ->
                     forecasts.all[area.zip] = forecasts.all[area.zip] <<< forecasts: it
+                    forecasts.all[area.zip]loading = null
                     delete forecasts.all[area.zip]['dateCols'] if forecasts.all[area.zip]dirty
                     delete forecasts.all[area.zip]['dirty']
 

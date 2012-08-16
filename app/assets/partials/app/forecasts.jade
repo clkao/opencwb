@@ -4,7 +4,7 @@ section.area-select(ng-controller='AreaSelect')
 section.area-forecast(ng-controller='AreaForecast')
   .control
     i.icon-repeat(ng-click="resetAll()")
-  article.forecast(ng-repeat='area in forecasts.current')
+  article.forecast(ng-repeat='area in forecasts.current',ng-class='area.loading')
     .row-fluid
       .span10
         {{area.county}} {{area.name}}
