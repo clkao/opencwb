@@ -2,7 +2,7 @@ _ = require \underscore
 
 @include = ->
     cwb = require \cwbtw
-    @use \bodyParser, @app.router, @express.static __dirname + \/_public
+    @use \bodyParser, @app.router, @express.static __dirname + \/../_public
 
     Schema = @mongoose.Schema
     ForecastSchema = new Schema do
@@ -17,6 +17,7 @@ _ = require \underscore
         time: Date
     RealBin = require \path .dirname do
         require \fs .realpathSync __filename
+    RealBin -= /\/src/
     Forecast = @mongoose.model \Forecast, ForecastSchema
     LastUpdated = @mongoose.model \LastUpdated, LastUpdatedSchema
 
@@ -24,11 +25,10 @@ _ = require \underscore
         @last = last.time
 
     sendFile = (file) -> ->
+        console.log file
+        console.log RealBin
         @response.contentType \text/html
-        @response.sendfile "#RealBin/#file"
-
-    @get '/': sendFile \index.html
-    @get '/forecasts': sendFile \_public/index.html
+        @response.sendfile "#RealBin/_public/#file"
 
     JsonType = { \Content-Type : 'application/json; charset=utf-8' }
 
@@ -51,3 +51,5 @@ _ = require \underscore
     @get '/1/area': (p) ->
         err, results <~ get_area
         @response.send JSON.stringify(results), JsonType, 200
+
+    @get '/:what': sendFile \index.html
