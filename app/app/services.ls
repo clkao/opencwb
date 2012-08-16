@@ -50,7 +50,7 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
             forecasts.starred[zip] = !forecasts.starred[zip]
             store.save {key: \starred, starred: forecasts.starred}
         resetAll: ->
-            forecasts.current = [forecasts.all[zip] for zip of forecasts.starred]
+            forecasts.current = [forecasts.all[zip] for zip,t of forecasts.starred when t]
             forecasts._current = {[zip,f] for zip,f of forecasts.current}
         init: (areas) ->
             config <- store.get 'starred'
