@@ -1,4 +1,5 @@
 **/.DS_Store
+src/*.js
 nbproject
 manifest.mf
 build.xml

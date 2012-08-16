@@ -1,8 +1,15 @@
 HTML_FILES=$(shell find app -name '*.html')
+JS_FILES=src/app.js src/main.js
 
 .jade.html:
 	jade --pretty $<
 
-all :: $(HTML_FILES)
+.ls.js:
+	env PATH="$$PATH:./node_modules/LiveScript/bin" livescript -c  $<
 
-.SUFFIXES: .jade .html
+all :: $(HTML_FILES) $(JS_FILES)
+
+run :: all
+	node src/app.js
+
+.SUFFIXES: .jade .html .ls .js
