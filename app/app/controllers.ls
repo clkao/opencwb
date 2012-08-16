@@ -1,48 +1,61 @@
-
 mod = {}
 
-mod.AppCtrl = [
-  '$scope'
-  '$location'
-  '$resource'
-  '$rootScope'
-
+mod.OpenCWB = [ \$scope \$location \$resource \$rootScope
 (s, $location, $resource, $rootScope) ->
 
-  # Uses the url to determine if the selected
-  # menu item should have the class active.
   s.$location = $location
   s.$watch('$location.path()', (path) ->
     s.activeNavId = path || '/'
   )
 
-  # getClass compares the current url with the id.
-  # If the current url starts with the id it returns 'active'
-  # otherwise it will return '' an empty string. E.g.
-  #
-  #   # current url = '/products/1'
-  #   getClass('/products') # returns 'active'
-  #   getClass('/orders') # returns ''
-  #
   s.getClass = (id) ->
     if s.activeNavId.substring(0, id.length) == id
       return 'active'
     else
       return ''
+  s.$on \area-changed, (...args) ->
+      s.$broadcast(\xarea-changed, ...args)
 ]
 
-mod.MyCtrl1 = [
-  '$scope'
-
-(s) ->
-  s.Title = "MyCtrl1"
+mod.AreaSelect = [ '$scope' '$http' 'forecasts' (s, $http, forecasts) ->
+  s.change = -> s.$emit \area-changed, s.currentArea
+  $http.get(\/1/area).success ->
+    s.areas = it
+    forecasts.init(it)
 ]
 
-mod.MyCtrl2 = [
-  '$scope'
+mod.AreaForecast = [ '$scope', 'forecasts'
+(s, forecasts) ->
+  s.forecasts = forecasts
+  s.getDate = (t) ->
+      d = new Date t
+      "#{d.getMonth!+1}/#{d.getDate!}"
+  s.getTime = (t) ->
+      new Date(t)getHours!
 
-(s) ->
-  s.Title = "MyCtrl2"
+  dayOrNight = (h) -> (if h >= 18 || h <= 3 then 'night' else 'day')
+
+  s.getWeatherStyle = (t,f) ->
+      [,icon] = f.WeatherIcon.match /Weather(\d+).bmp/;
+      what = dayOrNight(s.getTime t)
+      {background-image: "url('http://www.cwb.gov.tw/township/enhtml/pic/#{what}pic/#{what}_#icon.png')"}
+  s.getDayOrNight = (t) ->
+      h = s.getTime t
+      res = \forecast-slot- + dayOrNight(h)
+      res += ' forecast-slot-sep' if h === 0
+      res
+  s.getDateCols = (f) ->
+      return [] unless f?
+      f.dateCols ||= for {time},i in f when i === 0 || new Date(time)getHours! === 0 then do
+          date: s.getDate(time)
+          cols: (24 - new Date(time)getHours!) / 3
+  s.isStarred = forecasts.isStarred
+  s.toggleStarred = forecasts.toggleStarred
+  s.resetAll = forecasts.resetAll
+
+  (,,...[areas]) <- s.$on \xarea-changed
+  for a in areas
+      forecasts.addForecast a
 ]
 
 angular.module('app.controllers', []).controller(mod)

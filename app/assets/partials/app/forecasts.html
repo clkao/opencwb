@@ -1,0 +1,25 @@
+
+<section ng-controller="AreaSelect" class="area-select">
+  <select multiple="multiple" ng-change="change()" ng-model="currentArea" ng-options="a.name group by a.county for a in areas | filter:search" class="areas"></select>
+</section>
+<section ng-controller="AreaForecast" class="area-forecast">
+  <div class="control"><i ng-click="resetAll()" class="icon-repeat"></i></div>
+  <article ng-repeat="area in forecasts.current" class="forecast">
+    <div class="row-fluid">
+      <div class="span10">{{area.county}} {{area.name}}</div>
+      <div class="span2 actions"><i title="{{ area.forecasts[0] }}" class="icon-info-sign"></i><i ng-class="isStarred(area.zip)" ng-click="toggleStarred(area.zip)"></i>
+        <input type="checkbox" class="read"/>
+      </div>
+    </div>
+    <div style="clear: both" class="clear"></div>
+    <div class="forecasts row-fluid"><span ng-repeat="f in getDateCols(area.forecasts)" ng-class="&quot;forecast-date-&quot;+f.cols" class="forecast-date">{{f.date}}</span>
+      <div style="clear: both" class="clear"></div>
+      <div ng-repeat="f in area.forecasts" ng-class="getDayOrNight(f.time)" class="forecast-slot">
+        <div class="clear">{{getTime(f.time)}}</div><span ng-style="getWeatherStyle(f.time, f.forecast)" class="icon-cwb-weather"></span>
+        <div class="clear temp">{{f.forecast.Temperature}}</div>
+        <div class="clear pop">{{f.forecast.PoP}}%</div><i title="{{f.forecast.WindDir}}" class="icon-circle-arrow-up icon-wind icon-wind-{{f.forecast.WindDir}}"></i>
+        <div class="clear windlevel">{{f.forecast.WindLevel}}</div><i title="{{f.forecast.Wx}}" class="icon-info-sign"></i>
+      </div>
+    </div>
+  </article>
+</section>

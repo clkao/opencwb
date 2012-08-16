@@ -20,8 +20,7 @@ html(lang='en')
       };
     script(src='/js/vendor.js')
     script(src='/js/app.js')
-  body(ng-controller='AppCtrl')
-    .wrapper
+  body(ng-controller='OpenCWB')
       .navbar
         .navbar-inner
           .container
@@ -30,16 +29,14 @@ html(lang='en')
               span.icon-bar
               span.icon-bar
             .brand
-              a(href='/') Angular Brunch Seed
+              a(href='/') OpenCWB
             .nav-collapse
               div(ng-include="'/partials/app/nav.html'")
-      .container.main-content
-        div(ng-view)
-        div Angular Brunch seed app: v<span app-version></span>
-      .push
+      .container.main-content(ng-view)
+#      .push
 
-    footer.footer
-      .container
-        p
-          small
-            a(href='https://github.com/scotch/angular-brunch-seed') angular-brunch-seed | source
+#    footer.footer
+#      .container
+#        p
+#          small
+#            a(href='https://github.com/scotch/angular-brunch-seed') angular-brunch-seed | source

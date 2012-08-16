@@ -1,0 +1,32 @@
+section.area-select(ng-controller='AreaSelect')
+  select.areas(multiple,ng-change='change()', ng-model='currentArea', ng-options='a.name group by a.county for a in areas | filter:search')
+
+section.area-forecast(ng-controller='AreaForecast')
+  .control
+    i.icon-repeat(ng-click="resetAll()")
+  article.forecast(ng-repeat='area in forecasts.current')
+    .row-fluid
+      .span10
+        {{area.county}} {{area.name}}
+      .span2.actions
+        i.icon-info-sign(title='{{ area.forecasts[0] }}')
+        i(ng-class="isStarred(area.zip)",ng-click="toggleStarred(area.zip)")
+        input.read(type="checkbox")
+    .clear(style="clear: both")
+    .forecasts.row-fluid
+      span.forecast-date(ng-repeat='f in getDateCols(area.forecasts)',ng-class='"forecast-date-"+f.cols')
+          {{f.date}}
+          
+      .clear(style="clear: both")
+      .forecast-slot(ng-repeat='f in area.forecasts',ng-class='getDayOrNight(f.time)')
+          .clear
+            {{getTime(f.time)}}
+          span.icon-cwb-weather(ng-style="getWeatherStyle(f.time, f.forecast)")
+          div.clear.temp
+            {{f.forecast.Temperature}}
+          div.clear.pop
+            {{f.forecast.PoP}}%
+          i(class='icon-circle-arrow-up icon-wind icon-wind-{{f.forecast.WindDir}}',title='{{f.forecast.WindDir}}')
+          div.clear.windlevel
+            {{f.forecast.WindLevel}}
+          i.icon-info-sign(title='{{f.forecast.Wx}}')

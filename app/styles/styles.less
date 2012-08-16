@@ -1,0 +1,67 @@
+body {
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.main-content {
+  height: 100%;
+  width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  overflow: hidden;
+  padding-bottom: 0px;
+}
+
+.area-select {
+  padding: 10px;
+  width: 200px;
+  overflow: hidden;
+}
+
+select.areas {
+  height: 400px;
+}
+
+.area-forecast {
+  overflow-y: scroll;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-box-flex: 1;
+}
+
+article.forecast {
+  box-shadow: 5px 5px 5px rgba(210, 210, 210, 0.6);
+  background: whiteSmoke;
+  margin: 1em;
+  padding-top: 1em;
+  padding-left: 1em;
+}
+
+.forecast-slot {
+  width: 30px;
+  float: left;
+}
+.forecast-date {
+  float: left;
+}
+.forecast-date-4 {
+  .forecast-date;
+  width: 120px;
+}
+.forecast-date-8 {
+  .forecast-date;
+  .forecast-slot-sep;
+  width: 240px;
+}
+.forecast-slot-sep {
+  border-left: 1px solid black;
+  padding-left: 2px;
+}
+
+.icon-cwb-weather {
+  background-size: 100%;
+  background-position: 0px 0px;
+  width: 30px;
+  height: 30px;
+}

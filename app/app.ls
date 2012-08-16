@@ -4,11 +4,11 @@ App = angular.module \app, <[ ngCookies ngResource app.controllers app.directive
 App.config [ '$routeProvider' '$locationProvider'
 ($routeProvider, $locationProvider, config) ->
   $routeProvider
-    .when \/view1, templateUrl: \/partials/app/partial1.html
+    .when \/forecasts, templateUrl: \/partials/app/forecasts.html
     .when \/view2, templateUrl: \/partials/app/partial2.html
     # Catch all
-    .otherwise redirectTo: \/view1
+    .otherwise redirectTo: \/forecasts
 
   # Without serve side support html5 must be disabled.
-  $locationProvider.html5Mode false
+  $locationProvider.html5Mode true
 ]
