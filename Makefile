@@ -1,4 +1,4 @@
-HTML_FILES=$(shell find app -name '*.html')
+HTML_FILES=$(shell find app -name '*.jade' | sed s/jade/html/)
 JS_FILES=src/app.js src/main.js
 
 .jade.html:
