@@ -26,7 +26,7 @@ section.area-forecast(ng-controller='AreaForecast')
             {{f.forecast.Temperature}}
           div.clear.pop
             {{f.forecast.PoP}}%
-          i(class='icon-circle-arrow-up icon-wind icon-wind-{{f.forecast.WindDir}}',title='{{f.forecast.WindDir}}')
+          i(class='icon-{{windIcon(f.forecast.WindLevel)}} icon-wind icon-wind-{{f.forecast.WindDir}}',title='{{f.forecast.WindDir}}')
           div.clear.windlevel
             {{f.forecast.WindLevel}}
           i.icon-info-sign(title='{{f.forecast.Wx}}')

@@ -35,6 +35,7 @@ mod.AreaForecast = [ '$scope', 'forecasts'
 
   dayOrNight = (h) -> (if h >= 18 || h <= 3 then 'night' else 'day')
 
+  s.windIcon = (windlevel) -> if windlevel >= 3 then \circle-arrow-up else \arrow-up
   s.getWeatherStyle = (t,f) ->
       [,icon] = f.WeatherIcon.match /Weather(\d+).bmp/;
       what = dayOrNight(s.getTime t)
@@ -50,6 +51,7 @@ mod.AreaForecast = [ '$scope', 'forecasts'
           date: s.getDate(time)
           cols: (24 - new Date(time)getHours!) / 3
       area.dateCols
+
   s.isStarred = forecasts.isStarred
   s.toggleStarred = forecasts.toggleStarred
   s.resetAll = forecasts.resetAll
