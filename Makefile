@@ -12,4 +12,7 @@ all :: $(HTML_FILES) $(JS_FILES)
 run :: all
 	node src/app.js
 
+heroku :: all
+	rm -rf _public && git checkout heroku && git merge master && scripts/compile-jade.sh && brunch b -m && git add -A -f src _public && git commit -m 'regen' && git push heroku heroku:master -f && git checkout master
+
 .SUFFIXES: .jade .html .ls .js
