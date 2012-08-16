@@ -11,7 +11,6 @@ section.area-forecast(ng-controller='AreaForecast')
       .span2.actions
         i.icon-info-sign(title='{{ area.forecasts[0] }}')
         i(ng-class="isStarred(area.zip)",ng-click="toggleStarred(area.zip)")
-        input.read(type="checkbox")
     .clear(style="clear: both")
     .forecasts.row-fluid
       span.forecast-date(ng-repeat='f in getDateCols(area.forecasts)',ng-class='"forecast-date-"+f.cols')
