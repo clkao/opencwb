@@ -61,5 +61,7 @@
 // Utility classes
 @import "vendor/styles/bootstrap/utilities"; // Has to be last to override when necessary
 
+@import "_responsive";
+
 // Your custom theme
 @import "themes/custom/_overrides";
