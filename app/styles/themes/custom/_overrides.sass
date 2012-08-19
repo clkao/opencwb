@@ -1,0 +1,32 @@
+/*
+ *Place custom styles here. Thes styles are ment to be loaded after
+ *bootstrap, so the may override it's behavior.
+
+body
+  +gradient-striped($blue)
+
+// Footer
+.footer
+  background-color: #1a1a1a
+  padding: 30px 0
+  text-shadow: none
+  +box-shadow(inset 0 5px 15px rgba(0, 0, 0, 0.025))
+
+// Sticky Footer
+
+$footerHeight: 88px
+
+html, body
+  height: 100%
+
+.wrapper
+  min-height: 100%
+  height: auto !important
+  height: 100%
+  margin-bottom: -$footerHeight
+
+.push
+  height: $footerHeight
+
+.wrapper > .container
+  padding-top: 24px
