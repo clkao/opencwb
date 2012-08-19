@@ -15,11 +15,9 @@ section.area-forecast(ng-controller='AreaForecast')
         i.icon-remove-sign(ng-click="remove(area)")
     .clear(style="clear: both")
     .forecasts.row-fluid
-      span.forecast-date(ng-repeat='f in getDateCols(area)',ng-class='"forecast-date-"+f.cols')
-          {{f.date}}
-          
-      .clear(style="clear: both")
-      .forecast-slot(ng-repeat='f in area.forecasts',ng-class='getDayOrNight(f.time)')
+      .forecast-date(ng-repeat='(f_day,forecasts) in getForecastsByDate(area)',ng-class='{"forecast-date-sep": $index > 0}')
+        .date {{f_day}}
+        .forecast-slot(ng-repeat='f in forecasts',ng-class='getDayOrNight(f.time)')
           .clear
             {{getTime(f.time)}}
           span.icon-cwb-weather(ng-style="getWeatherStyle(f.time, f.forecast)",title='{{f.forecast.Wx}}')
