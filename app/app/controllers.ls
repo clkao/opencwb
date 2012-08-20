@@ -15,15 +15,16 @@ mod.OpenCWB = [ \$scope \$location \$resource \$rootScope \forecasts
       return ''
   $rootScope.$on \area-list, (, it) ->
       s.areas = it
-  #  s.areas = forecasts.areas
+
   s.$watch 'currentArea', (newV, oldV)->
       forecasts.addForecast newV if newV
 ]
 
-mod.AreaSelect = [ '$scope' '$http' 'forecasts' (s, $http, forecasts) ->
+mod.AreaSelect = [ '$scope' '$http' 'forecasts', '$rootScope' (s, $http, forecasts, $rootScope) ->
   s.$watch 'currentArea', (newV, oldV)->
       if newV => for a in newV => forecasts.addForecast a
-  s.areas = forecasts.areas
+  $rootScope.$on \area-list, (, it) ->
+      s.areas = it
 ]
 
 mod.AreaForecast = [ '$scope', 'forecasts'
