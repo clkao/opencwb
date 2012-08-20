@@ -1,7 +1,7 @@
 mod = {}
 
-mod.OpenCWB = [ \$scope \$location \$resource \$rootScope
-(s, $location, $resource, $rootScope) ->
+mod.OpenCWB = [ \$scope \$location \$resource \$rootScope \forecasts
+(s, $location, $resource, $rootScope, forecasts) ->
 
   s.$location = $location
   s.$watch('$location.path()', (path) ->
@@ -13,15 +13,17 @@ mod.OpenCWB = [ \$scope \$location \$resource \$rootScope
       return 'active'
     else
       return ''
-  s.$on \area-changed, (...args) ->
-      s.$broadcast(\xarea-changed, ...args)
+  $rootScope.$on \area-list, (, it) ->
+      s.areas = it
+  #  s.areas = forecasts.areas
+  s.$watch 'currentArea', (newV, oldV)->
+      forecasts.addForecast newV if newV
 ]
 
 mod.AreaSelect = [ '$scope' '$http' 'forecasts' (s, $http, forecasts) ->
-  s.change = -> s.$emit \area-changed, s.currentArea
-  $http.get(\/1/area).success ->
-    s.areas = it
-    forecasts.init(it)
+  s.$watch 'currentArea', (newV, oldV)->
+      if newV => for a in newV => forecasts.addForecast a
+  s.areas = forecasts.areas
 ]
 
 mod.AreaForecast = [ '$scope', 'forecasts'
@@ -62,10 +64,6 @@ mod.AreaForecast = [ '$scope', 'forecasts'
     geocoder = new google.maps.Geocoder();
     result, status <- geocoder.geocode {latLng: new google.maps.LatLng latitude,longitude } 
     forecasts.setCurrent result[3]address_components[0]short_name
-
-  (,,...[areas]) <- s.$on \xarea-changed
-  for a in areas
-      forecasts.addForecast a
 ]
 
 angular.module('app.controllers', []).controller(mod)

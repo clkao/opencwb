@@ -1,5 +1,5 @@
-section.area-select(ng-controller='AreaSelect')
-  select.areas(multiple,ng-change='change()', ng-model='currentArea', ng-options='a.name group by a.county for a in areas | filter:search')
+section.area-select(ng-controller='AreaSelect').hidden-phone
+  select.areas(multiple,ng-model='currentArea',ng-options='a.name group by a.county for a in areas | filter:search')
 
 section.area-forecast(ng-controller='AreaForecast')
   .control

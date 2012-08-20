@@ -11,7 +11,7 @@ mod.store = ->
         name: \starred
     }, -> it
 
-mod.forecasts = ['$http', 'store', ($http, store) ->
+mod.forecasts = ['$http', 'store', '$rootScope', ($http, store, $rootScope) ->
     var splicer
     forecasts = {
         current: []
@@ -34,7 +34,6 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
         setCurrent: (zip) ->
             [a] = [a for a in forecasts.areas when zip is a.zip]
             return unless a
-            console.log a
             forecasts.addForecast a
             forecasts.all[zip]geoCurrent = true
         refresh: (area) ->
@@ -58,6 +57,11 @@ mod.forecasts = ['$http', 'store', ($http, store) ->
             for a in areas when forecasts.starred[a.zip] => forecasts.addForecast a
             forecasts.areas = areas
     }
+
+    $http.get(\/1/area).success ->
+        forecasts.areas = it
+        forecasts.init(it)
+        $rootScope.$emit \area-list, it
 
     splicer = ->
         now = new Date!
