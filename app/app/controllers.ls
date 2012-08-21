@@ -71,21 +71,12 @@ mod.TyphoonCtrl =
     * '$scope'
     * '$http'
     * (s, $http) ->
-        render_windr = ({wr,ne,se,sw,nw}:windr, lat, lon) ->
+        render_windr = ({wr}:windr, lat, lon) ->
             path = []
-            r = ne * 1852 / 111000
-            x = lat + r * i / 10
-            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
-                            lon + r * Math.sin(i/180*Math.PI)) for i in [0 to 90 by 6]]
-            r = se * 1852 / 111000
-            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
-                            lon + r * Math.sin(i/180*Math.PI)) for i in [90 to 180 by 6]]
-            r = sw * 1852 / 111000
-            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
-                            lon + r * Math.sin(i/180*Math.PI)) for i in [180 to 270 by 6]]
-            r = nw * 1852 / 111000
-            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
-                            lon + r * Math.sin(i/180*Math.PI)) for i in [270 to 360 by 6]]
+            for qd,i in <[ne se sw nw]> => let r = windr[qd] * 1852 / 111000, steps = [90*i to 90*(i+1) by 6]
+                path.=concat [new google.maps.LatLng(
+                    lat + r * Math.cos(rx),
+                    lon + r * Math.sin(rx)) for rx in steps.map -> it / 180 * Math.PI]
             new google.maps.Polygon do
                 map: s.myMap
                 paths: path
