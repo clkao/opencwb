@@ -23,9 +23,11 @@ exports.config =
           'vendor/scripts/angular/angular.js'
           'vendor/scripts/angular/angular-resource.js'
           'vendor/scripts/angular/angular-cookies.js'
+          'vendor/scripts/angular-ui.js'
           'vendor/scripts/underscore-1.3.3.js'
           'vendor/scripts/date.js'
           'vendor/scripts/lawnchair-0.6.1.js'
+          'vendor/scripts/markerwithlabel.js'
         ]
 
     stylesheets:
