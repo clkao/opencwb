@@ -105,20 +105,21 @@ mod.TyphoonCtrl =
                         new google.maps.Size(24, 24)
         render_typhoon = (name, paths, issued, past) ->
             path = paths.map ->
-                [time, lat, lon, sw, ...wind] = it.split(" ")
+                [time, lat, lon, swind, ...wind] = it.split(" ")
                 lat = parseInt(lat) / 10
                 lon = parseInt(lon) / 10
+                swind = parseFloat swind
                 windr = []
                 while wind.length
                     wr = wind.shift!
                     [ne, ,, se ,,, sw ,,, nw ,,] = wind.splice(0, 12)map -> parseFloat it
                     windr.push {wr,ne,se,sw,nw}
-                { time, lat, lon, sw, windr }
+                { time, lat, lon, swind, windr }
 
             pastpath = [for node,i in past
-                [time, coor, sw] = node.split " "
+                [time, coor, swind] = node.split " "
                 [,lat,lon] = coor.match /(\d+)N(\d+)E/ .map (it) -> it/10
-                strong = sw >= 65
+                strong = swind >= 65
                 flip = if i % 2 then 1 else -1
                 pos = new google.maps.LatLng lat, lon
                 new MarkerWithLabel do
@@ -147,9 +148,9 @@ mod.TyphoonCtrl =
                 strokeWeight: 2
                 map: s.myMap
 
-            for {time,sw,lat,lon,windr},i in path
+            for {time,swind,lat,lon,windr},i in path
                 pos = new google.maps.LatLng(lat,lon)
-                strong = sw >= 65
+                strong = swind >= 65
                 flip = if i % 2 then 1 else -1
                 if i == path.length-1 => new MarkerWithLabel do
                     position: pos
