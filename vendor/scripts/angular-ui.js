@@ -489,7 +489,6 @@ angular.module('ui.directives').directive('uiKeypress', ['$parse', function($par
       link: function(scope, elm, attrs) {
         var opts = angular.extend({}, options, scope.$eval(attrs.uiOptions));
         var map = new google.maps.Map(elm[0], opts);
-        console.log(elm[0], opts);
         var model = $parse(attrs.uiMap);
 
         //Set scope variable for the map

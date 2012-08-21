@@ -48,4 +48,28 @@ _ = require \underscore
         err, results <~ get_area
         @response.send JSON.stringify(results), JsonType, 200
 
+    cache = {}
+    @get '/1/typhoon/jtwc/:name': (p) ->
+        if results = cache[p.name]
+            return @response.send JSON.stringify(results), JsonType, 200
+
+        error, {statusCode}, body <~ (require \request) "http://jtwccdn.appspot.com/NOOC/nmfc-ph/RSS/jtwc/warnings/#{p.name}.tcw"
+        paths = []
+        past = []
+        lines = body.split("\n")map (it) -> it - /\s*$/
+        [,,issued] = lines.shift!split " "
+        for line in lines when date = line.match /^(\d\d\d\d)(\d\d)(\d\d)(\d\d) /
+            if name
+                past.push line
+            else
+                issued = date[0]
+                [year, month, day, hour] = date[1 to 4]
+                [,,name] = line.split(" ")
+        for line in lines
+            if line.match(/^T/)
+                paths.push line
+            break if line == 'AMP'
+        cache[p.name] = results = { name, paths, issued, past }
+        @response.send JSON.stringify(results), JsonType, 200
+
     @get '/:what': sendFile \index.html

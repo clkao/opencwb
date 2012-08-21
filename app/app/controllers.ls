@@ -69,17 +69,76 @@ mod.AreaForecast = [ '$scope', 'forecasts'
 
 mod.TyphoonCtrl = 
     * '$scope'
-    * (s) ->
-        render_typhoon = (name, $str) ->
-            path = $str.split(" \n").map ->
+    * '$http'
+    * (s, $http) ->
+        render_windr = ({wr,ne,se,sw,nw}:windr, lat, lon) ->
+            path = []
+            r = ne * 1852 / 111000
+            x = lat + r * i / 10
+            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
+                            lon + r * Math.sin(i/180*Math.PI)) for i in [0 to 90 by 6]]
+            r = se * 1852 / 111000
+            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
+                            lon + r * Math.sin(i/180*Math.PI)) for i in [90 to 180 by 6]]
+            r = sw * 1852 / 111000
+            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
+                            lon + r * Math.sin(i/180*Math.PI)) for i in [180 to 270 by 6]]
+            r = nw * 1852 / 111000
+            path.=concat [new google.maps.LatLng(lat + r * Math.cos(i/180*Math.PI),
+                            lon + r * Math.sin(i/180*Math.PI)) for i in [270 to 360 by 6]]
+            new google.maps.Polygon do
+                map: s.myMap
+                paths: path
+                strokeColor: \#FF0000
+                strokeOpacity: 0.15
+                strokeWeight: 2
+                fillColor: \#FF0000
+                fillOpacity: 0.1
+
+        hurricane = new google.maps.MarkerImage \/img/hurricane.png, null,
+                        new google.maps.Point(0,0),
+                        new google.maps.Point(12, 12),
+                        new google.maps.Size(24, 24)
+        hurricane-filled = new google.maps.MarkerImage \/img/hurricane-filled.png, null,
+                        new google.maps.Point(0,0),
+                        new google.maps.Point(12, 12),
+                        new google.maps.Size(24, 24)
+        render_typhoon = (name, paths, issued, past) ->
+            path = paths.map ->
                 [time, lat, lon, sw, ...wind] = it.split(" ")
                 lat = parseInt(lat) / 10
                 lon = parseInt(lon) / 10
                 windr = []
                 while wind.length
-                    [wr, ne, ,, se ,,, sw ,,, nw ,,] = wind.splice 0, 13;
+                    wr = wind.shift!
+                    [ne, ,, se ,,, sw ,,, nw ,,] = wind.splice(0, 12)map -> parseFloat it
                     windr.push {wr,ne,se,sw,nw}
                 { time, lat, lon, sw, windr }
+
+            pastpath = [for node,i in past
+                [time, coor, sw] = node.split " "
+                [,lat,lon] = coor.match /(\d+)N(\d+)E/ .map (it) -> it/10
+                strong = sw >= 65
+                flip = if i % 2 then 1 else -1
+                pos = new google.maps.LatLng lat, lon
+                new MarkerWithLabel do
+                    position: pos
+                    map: s.myMap
+                    labelContent: ''
+                    labelAnchor: new google.maps.Point(20, 30 * flip)
+                    labelClass: "labels"
+                    labelStyle: opacity: 0.75
+                    opacity: 0.7
+                    icon: if strong then hurricane-filled else hurricane
+
+                pos
+            ]
+            s.myPaths.push new google.maps.Polyline do
+                path: pastpath
+                strokeColor: \#FF0000
+                strokeOpacity: 0.7
+                strokeWeight: 2
+                map: s.myMap
 
             s.myPaths.push new google.maps.Polyline do
                 path: [new google.maps.LatLng(lat,lon) for {lat,lon} in path]
@@ -88,75 +147,55 @@ mod.TyphoonCtrl =
                 strokeWeight: 2
                 map: s.myMap
 
-            for {time,lat,lon,windr},i in path
-                console.log time, windr
+            for {time,sw,lat,lon,windr},i in path
                 pos = new google.maps.LatLng(lat,lon)
+                strong = sw >= 65
+                flip = if i % 2 then 1 else -1
                 if i == path.length-1 => new MarkerWithLabel do
                     position: pos
                     map: s.myMap
                     labelContent: name
                     labelAnchor: new google.maps.Point(44, 60)
                     labelClass: "typhoon-name"
-                    icon: 'foo.png'
+                    icon: hurricane
                 new MarkerWithLabel do
                     position: pos
                     map: s.myMap
                     labelContent: time
-                    labelAnchor: new google.maps.Point(22, 0)
+                    labelAnchor: new google.maps.Point(20, 30 * flip)
                     labelClass: "labels"
                     labelStyle: opacity: 0.75
-                    icon: 'foo.png'
-                for {wr,ne,se,sw,nw} in windr
-                    s.myCircles.push new google.maps.Circle do
-                        strokeColor: \#FF0000
-                        strokeOpacity: 0.15
-                        strokeWeight: 2
-                        fillColor: \#FF0000
-                        fillOpacity: 0.1,
-                        map: s.myMap,
-                        center: pos
-                        radius: Math.max(ne,se,sw,nw) * 1852
-
+                    opacity: 0.7
+                    icon: if strong then hurricane-filled else hurricane
+                windr.forEach -> render_windr it, lat, lon
 
         s.myMarkers = []
         s.myCircles = []
         s.myPaths = []
-        s.time = "082109Z"
-
-        typhoons = 
-            * name: \TEMBIN
-              jmv: """T000 210N 1254E 110 R064 030 NE QD 030 SE QD 030 SW QD 030 NW QD R050 065 NE QD 065 SE QD 060 SW QD 060 NW QD R034 100 NE QD 100 SE QD 095 SW QD 095 NW QD 
-T012 220N 1250E 115 R064 035 NE QD 035 SE QD 035 SW QD 035 NW QD R050 070 NE QD 065 SE QD 065 SW QD 065 NW QD R034 110 NE QD 110 SE QD 105 SW QD 105 NW QD 
-T024 227N 1243E 120 R064 040 NE QD 035 SE QD 035 SW QD 040 NW QD R050 070 NE QD 070 SE QD 065 SW QD 070 NW QD R034 120 NE QD 115 SE QD 115 SW QD 115 NW QD 
-T036 232N 1233E 120 R064 040 NE QD 040 SE QD 040 SW QD 040 NW QD R050 070 NE QD 070 SE QD 070 SW QD 070 NW QD R034 125 NE QD 120 SE QD 120 SW QD 125 NW QD 
-T048 236N 1220E 110 R064 040 NE QD 040 SE QD 040 SW QD 040 NW QD R050 070 NE QD 070 SE QD 070 SW QD 070 NW QD R034 130 NE QD 125 SE QD 125 SW QD 130 NW QD 
-T072 239N 1191E 075 R064 025 NE QD 025 SE QD 025 SW QD 025 NW QD R050 050 NE QD 050 SE QD 050 SW QD 050 NW QD R034 110 NE QD 100 SE QD 100 SW QD 110 NW QD 
-T096 238N 1165E 065 
-T120 238N 1144E 050"""
-            * name: \BOLAVEN
-              jmv: """T000 184N 1404E 055 R050 025 NE QD 025 SE QD 025 SW QD 025 NW QD R034 050 NE QD 050 SE QD 050 SW QD 050 NW QD 
-T012 190N 1391E 065 R050 030 NE QD 025 SE QD 025 SW QD 030 NW QD R034 065 NE QD 060 SE QD 060 SW QD 065 NW QD 
-T024 195N 1376E 070 R064 020 NE QD 020 SE QD 020 SW QD 020 NW QD R050 040 NE QD 035 SE QD 035 SW QD 040 NW QD R034 085 NE QD 080 SE QD 080 SW QD 085 NW QD 
-T036 201N 1359E 075 R064 025 NE QD 025 SE QD 025 SW QD 025 NW QD R050 045 NE QD 045 SE QD 045 SW QD 045 NW QD R034 100 NE QD 095 SE QD 095 SW QD 100 NW QD 
-T048 207N 1340E 080 R064 030 NE QD 030 SE QD 030 SW QD 030 NW QD R050 050 NE QD 050 SE QD 050 SW QD 050 NW QD R034 110 NE QD 105 SE QD 105 SW QD 110 NW QD 
-T072 219N 1307E 090 R064 035 NE QD 035 SE QD 035 SW QD 035 NW QD R050 060 NE QD 060 SE QD 060 SW QD 060 NW QD R034 125 NE QD 120 SE QD 120 SW QD 125 NW QD 
-T096 230N 1281E 095 
-T120 245N 1256E 100"""
 
         s.$watch \myMap, ->
-            for {name,jmv} in typhoons => render_typhoon name, jmv
+            $http.get("/1/typhoon/jtwc/wp1612").success ({name,paths,issued, past})->
+                render_typhoon name, paths, issued, past
+                s.time = issued
+            $http.get("/1/typhoon/jtwc/wp1512").success ({name,paths,issued, past})->
+                render_typhoon name, paths, issued, past
+                s.time = issued
 
-        s.setZoomMessage = (zoom) -> console.log('You just zoomed to '+zoom+'!')
+        s.setZoomMessage = (zoom) ->
+            s.zoom = zoom
+            size = if zoom > 9 then 36 else if zoom > 5 then 24 else if zoom > 3 then 12 else 0
+            hurricane.scaledSize = new google.maps.Size(size, size)
+            hurricane.anchor = new google.maps.Point(size/2, size/2)
+            hurricane-filled.scaledSize = new google.maps.Size(size, size)
+            hurricane-filled.anchor = new google.maps.Point(size/2, size/2)
+
         s.addMarker = ($event) ->
-            console.log $event
             s.myMarkers.push new google.maps.Marker do
                 map: s.myMap
                 position: $event.latLng
-            console.log s.myMarkers
         s.mapOptions = do
           center: new google.maps.LatLng(24.03, 121.24)
           zoom: 6
           mapTypeId: google.maps.MapTypeId.ROADMAP
-        console.log s.mapOptions
 
 angular.module('app.controllers', []).controller(mod)
