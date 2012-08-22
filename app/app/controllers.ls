@@ -86,14 +86,10 @@ mod.TyphoonCtrl =
                 fillColor: color
                 fillOpacity: 0.1
 
-        hurricane = new google.maps.MarkerImage \/img/hurricane.png, null,
-                        new google.maps.Point(0,0),
-                        new google.maps.Point(12, 12),
-                        new google.maps.Size(24, 24)
-        hurricane-filled = new google.maps.MarkerImage \/img/hurricane-filled.png, null,
-                        new google.maps.Point(0,0),
-                        new google.maps.Point(12, 12),
-                        new google.maps.Size(24, 24)
+        hicons = {[i, new google.maps.MarkerImage "/img/#i.png", null,
+            new google.maps.Point(0,0),
+            new google.maps.Point(12, 12),
+            new google.maps.Size(24, 24)] for i in <[hurricane hurricane-filled]>}
 
         var render_typhoon2
         render_typhoon = (name, paths, issued, past) ->
@@ -125,7 +121,7 @@ mod.TyphoonCtrl =
                     labelClass: "labels"
                     labelStyle: opacity: 0.75
                     opacity: 0.7
-                    icon: if strong then hurricane-filled else hurricane
+                    icon: if strong then hicons[\hurricane-filled] else hicons.hurricane
 
                 pos
             ]
@@ -153,7 +149,7 @@ mod.TyphoonCtrl =
                     labelContent: name
                     labelAnchor: new google.maps.Point(44, 60)
                     labelClass: "typhoon-name #source"
-                    icon: hurricane
+                    icon: hicons.hurricane
                 new MarkerWithLabel do
                     position: pos
                     map: s.myMap
@@ -162,7 +158,7 @@ mod.TyphoonCtrl =
                     labelClass: "typhoon-time #source"
                     labelStyle: opacity: 0.75
                     opacity: 0.7
-                    icon: if strong then hurricane-filled else hurricane
+                    icon: if strong then hicons[\hurricane-filled] else hicons.hurricane
                 windr?forEach -> render_windr it, lat, lon, pathColor
 
         s.myMarkers = []
@@ -184,10 +180,9 @@ mod.TyphoonCtrl =
         s.setZoomMessage = (zoom) ->
             s.zoom = zoom
             size = if zoom > 9 then 36 else if zoom > 5 then 24 else if zoom > 3 then 12 else 0
-            hurricane.scaledSize = new google.maps.Size(size, size)
-            hurricane.anchor = new google.maps.Point(size/2, size/2)
-            hurricane-filled.scaledSize = new google.maps.Size(size, size)
-            hurricane-filled.anchor = new google.maps.Point(size/2, size/2)
+            for name,i of hicons
+                i.scaledSize = new google.maps.Size(size, size)
+                i.anchor = new google.maps.Point(size/2, size/2)
 
         s.addMarker = ($event) ->
             s.myMarkers.push new google.maps.Marker do
