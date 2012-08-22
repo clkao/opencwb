@@ -71,7 +71,7 @@ mod.TyphoonCtrl =
     * '$scope'
     * '$http'
     * (s, $http) ->
-        render_windr = ({wr}:windr, lat, lon) ->
+        render_windr = ({wr}:windr, lat, lon, color = \#ff0000) ->
             path = []
             for qd,i in <[ne se sw nw]> => let r = windr[qd] * 1852 / 111000, steps = [90*i to 90*(i+1) by 6]
                 path.=concat [new google.maps.LatLng(
@@ -80,10 +80,10 @@ mod.TyphoonCtrl =
             new google.maps.Polygon do
                 map: s.myMap
                 paths: path
-                strokeColor: \#FF0000
+                strokeColor: color
                 strokeOpacity: 0.15
                 strokeWeight: 2
-                fillColor: \#FF0000
+                fillColor: color
                 fillOpacity: 0.1
 
         hurricane = new google.maps.MarkerImage \/img/hurricane.png, null,
@@ -163,7 +163,7 @@ mod.TyphoonCtrl =
                     labelStyle: opacity: 0.75
                     opacity: 0.7
                     icon: if strong then hurricane-filled else hurricane
-                windr?forEach -> render_windr it, lat, lon
+                windr?forEach -> render_windr it, lat, lon, pathColor
 
         s.myMarkers = []
         s.myCircles = []
@@ -178,7 +178,7 @@ mod.TyphoonCtrl =
                 s.JTWCtime = issued
             $http.get("/1/typhoon/cwb").success ->
                 for t in it => let t
-                    render_typhoon2 t.name, [time: \T0, lon: t.lon, lat: t.lat]+++ t.forecasts, t.date, [], \#0000ff, \CWB
+                    render_typhoon2 t.name, t.forecasts, t.date, [], \#0000ff, \CWB
                 s.CWBtime = t.date
 
         s.setZoomMessage = (zoom) ->
