@@ -9,3 +9,14 @@ A project to provide public and open API for weather information in Taiwan.
     app/                      --> files for building static content using brunch
 
     src/                      --> zappajs-based server
+
+## to start a server
+
+make sure you have mongodb
+
+    npm i
+    make run
+
+and you should see a localhost server to connect to
+
+you might want to run "brunch w" to watch files during development

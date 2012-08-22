@@ -8,6 +8,7 @@ JS_FILES=src/app.js src/main.js
 	env PATH="$$PATH:./node_modules/LiveScript/bin" livescript -c  $<
 
 all :: $(HTML_FILES) $(JS_FILES)
+	env PATH="$$PATH:./node_modules/brunch/bin" brunch b
 
 run :: all
 	node src/app.js
