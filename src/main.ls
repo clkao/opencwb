@@ -50,14 +50,14 @@ _ = require \underscore
 
     cache = {}
     @get '/1/typhoon/jtwc/:name': (p) ->
-        if results = cache[p.name]
-            return @response.send JSON.stringify(results), JsonType, 200
+        if {results,expiry}? = cache[p.name]
+            if expiry > new Date!getTime!
+                return @response.send JSON.stringify(results), JsonType, 200
 
         error, {statusCode}, body <~ (require \request) "http://jtwccdn.appspot.com/NOOC/nmfc-ph/RSS/jtwc/warnings/#{p.name}.tcw"
         paths = []
         past = []
         lines = body.split("\n")map (it) -> it - /\s*$/
-        [,,issued] = lines.shift!split " "
         for line in lines when date = line.match /^(\d\d\d\d)(\d\d)(\d\d)(\d\d) /
             if name
                 past.push line
@@ -69,7 +69,8 @@ _ = require \underscore
             if line.match(/^T/)
                 paths.push line
             break if line == 'AMP'
-        cache[p.name] = results = { name, paths, issued, past }
+        results = { name, paths, issued, past }
+        cache[p.name] = { results, expiry: new Date!getTime! + 10*60*1000 }
         @response.send JSON.stringify(results), JsonType, 200
 
     @get '/:what': sendFile \index.html
