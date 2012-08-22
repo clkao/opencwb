@@ -166,12 +166,10 @@ mod.TyphoonCtrl =
         s.myPaths = []
 
         s.$watch \myMap, ->
-            $http.get("/1/typhoon/jtwc/wp1612").success ({name,paths,issued, past})->
-                render_typhoon name, paths, issued, past
-                s.JTWCtime = issued
-            $http.get("/1/typhoon/jtwc/wp1512").success ({name,paths,issued, past})->
-                render_typhoon name, paths, issued, past
-                s.JTWCtime = issued
+            for id in <[wp1612 wp1512]>
+                $http.get("/1/typhoon/jtwc/#id").success ({name,paths,issued, past})->
+                    render_typhoon name, paths, issued, past
+                    s.JTWCtime = issued
             $http.get("/1/typhoon/cwb").success ->
                 for t in it => let t
                     render_typhoon2 t.name, t.forecasts, t.date, [], \#0000ff, \CWB
