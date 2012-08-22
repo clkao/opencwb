@@ -3,6 +3,8 @@ section.typhoon(ng-controller='TyphoonCtrl')
     div(ng-repeat="circle in myCircles",ui-map-marker="myCircles[$index]")
     div(ng-repeat="path in myPaths",ui-map-marker="myPaths[$index]")
     div.map(ui-map="myMap",ui-options="mapOptions",ui-event="{'map-zoom_changed': 'setZoomMessage(myMap.getZoom())' }")
-    div.legend JTWC issued {{time}}Z
+    div.legend
+        div.CWB CWB {{CWBtime}}
+        div.JTWC(ng-show='JTWCtime') JTWC {{JTWCtime}}Z
 
  

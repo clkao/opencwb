@@ -172,14 +172,14 @@ mod.TyphoonCtrl =
         s.$watch \myMap, ->
             $http.get("/1/typhoon/jtwc/wp1612").success ({name,paths,issued, past})->
                 render_typhoon name, paths, issued, past
-                s.time = issued
+                s.JTWCtime = issued
             $http.get("/1/typhoon/jtwc/wp1512").success ({name,paths,issued, past})->
                 render_typhoon name, paths, issued, past
-                s.time = issued
+                s.JTWCtime = issued
             $http.get("/1/typhoon/cwb").success ->
                 for t in it => let t
-                    render_typhoon2 t.name, t.forecasts
-                s.time = t.time
+                    render_typhoon2 t.name, [time: \T0, lon: t.lon, lat: t.lat]+++ t.forecasts
+                s.CWBtime = t.date
 
         s.setZoomMessage = (zoom) ->
             s.zoom = zoom
