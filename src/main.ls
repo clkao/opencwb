@@ -64,9 +64,9 @@ _ = require \underscore
             if expiry > new Date!getTime!
                 return @response.send JSON.stringify(results), JsonType, 200
 
-        url_base = \http://www.usno.navy.mil/NOOC/nmfc-ph/RSS/jtwc/warnings
-        # url_base = http://jtwccdn.appspot.com/NOOC/nmfc-ph/RSS/jtwc/warnings/#{p.name}.tcw"
-        error, {statusCode}?, body <~ (require \request) "#url_base/#{p.name}.twc"
+        # url_base = \http://www.usno.navy.mil/NOOC/nmfc-ph/RSS/jtwc/warnings
+        url_base = \http://jtwccdn.appspot.com/NOOC/nmfc-ph/RSS/jtwc/warnings
+        error, {statusCode}?, body <~ (require \request) "#url_base/#{p.name}.tcw"
         body ||= ''
         paths = []
         past = []
