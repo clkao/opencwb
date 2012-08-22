@@ -48,6 +48,15 @@ _ = require \underscore
         err, results <~ get_area
         @response.send JSON.stringify(results), JsonType, 200
 
+    cwbcache = {}
+    @get '/1/typhoon/cwb': (p) ->
+        if {results,expiry}? = cwbcache
+            if expiry > new Date!getTime!
+                return @response.send JSON.stringify(results), JsonType, 200
+        data <~ cwb.fetch_typhoon!
+        results <~ cwb.parse_typhoon data
+        cwbcache := { results, expiry: new Date!getTime! + 10*60*1000 }
+
     cache = {}
     @get '/1/typhoon/jtwc/:name': (p) ->
         if {results,expiry}? = cache[p.name]
@@ -56,7 +65,8 @@ _ = require \underscore
 
         url_base = \http://www.usno.navy.mil/NOOC/nmfc-ph/RSS/jtwc/warnings
         # url_base = http://jtwccdn.appspot.com/NOOC/nmfc-ph/RSS/jtwc/warnings/#{p.name}.tcw"
-        error, {statusCode}, body <~ (require \request) "#url_base/#{p.name}.twc"
+        error, {statusCode}?, body <~ (require \request) "#url_base/#{p.name}.twc"
+        body ||= ''
         paths = []
         past = []
         lines = body.split("\n")map (it) -> it - /\s*$/

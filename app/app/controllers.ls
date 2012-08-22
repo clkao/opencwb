@@ -94,6 +94,8 @@ mod.TyphoonCtrl =
                         new google.maps.Point(0,0),
                         new google.maps.Point(12, 12),
                         new google.maps.Size(24, 24)
+
+        var render_typhoon2
         render_typhoon = (name, paths, issued, past) ->
             path = paths.map ->
                 [time, lat, lon, swind, ...wind] = it.split(" ")
@@ -106,7 +108,9 @@ mod.TyphoonCtrl =
                     [ne, ,, se ,,, sw ,,, nw ,,] = wind.splice(0, 12)map -> parseFloat it
                     windr.push {wr,ne,se,sw,nw}
                 { time, lat, lon, swind, windr }
+            render_typhoon2 name, path, issued, past
 
+        render_typhoon2 = (name, paths, issued, past=[]) ->
             pastpath = [for node,i in past
                 [time, coor, swind] = node.split " "
                 [,lat,lon] = coor.match /(\d+)N(\d+)E/ .map (it) -> it/10
@@ -133,17 +137,17 @@ mod.TyphoonCtrl =
                 map: s.myMap
 
             s.myPaths.push new google.maps.Polyline do
-                path: [new google.maps.LatLng(lat,lon) for {lat,lon} in path]
+                path: [new google.maps.LatLng(lat,lon) for {lat,lon} in paths]
                 strokeColor: \#FF0000
                 strokeOpacity: 0.7
                 strokeWeight: 2
                 map: s.myMap
 
-            for {time,swind,lat,lon,windr},i in path
+            for {time,swind,lat,lon,windr},i in paths
                 pos = new google.maps.LatLng(lat,lon)
                 strong = swind >= 65
                 flip = if i % 2 then 1 else -1
-                if i == path.length-1 => new MarkerWithLabel do
+                if i == paths.length-1 => new MarkerWithLabel do
                     position: pos
                     map: s.myMap
                     labelContent: name
@@ -159,7 +163,7 @@ mod.TyphoonCtrl =
                     labelStyle: opacity: 0.75
                     opacity: 0.7
                     icon: if strong then hurricane-filled else hurricane
-                windr.forEach -> render_windr it, lat, lon
+                windr?forEach -> render_windr it, lat, lon
 
         s.myMarkers = []
         s.myCircles = []
@@ -172,6 +176,10 @@ mod.TyphoonCtrl =
             $http.get("/1/typhoon/jtwc/wp1512").success ({name,paths,issued, past})->
                 render_typhoon name, paths, issued, past
                 s.time = issued
+            $http.get("/1/typhoon/cwb").success ->
+                for t in it => let t
+                    render_typhoon2 t.name, t.forecasts
+                s.time = t.time
 
         s.setZoomMessage = (zoom) ->
             s.zoom = zoom
