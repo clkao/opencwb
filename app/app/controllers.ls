@@ -110,7 +110,7 @@ mod.TyphoonCtrl =
                 { time, lat, lon, swind, windr }
             render_typhoon2 name, path, issued, past
 
-        render_typhoon2 = (name, paths, issued, past=[]) ->
+        render_typhoon2 = (name, paths, issued, past=[],pathColor=\#ff0000, source="") ->
             pastpath = [for node,i in past
                 [time, coor, swind] = node.split " "
                 [,lat,lon] = coor.match /(\d+)N(\d+)E/ .map (it) -> it/10
@@ -138,7 +138,7 @@ mod.TyphoonCtrl =
 
             s.myPaths.push new google.maps.Polyline do
                 path: [new google.maps.LatLng(lat,lon) for {lat,lon} in paths]
-                strokeColor: \#FF0000
+                strokeColor: pathColor
                 strokeOpacity: 0.7
                 strokeWeight: 2
                 map: s.myMap
@@ -152,14 +152,14 @@ mod.TyphoonCtrl =
                     map: s.myMap
                     labelContent: name
                     labelAnchor: new google.maps.Point(44, 60)
-                    labelClass: "typhoon-name"
+                    labelClass: "typhoon-name #source"
                     icon: hurricane
                 new MarkerWithLabel do
                     position: pos
                     map: s.myMap
                     labelContent: time
                     labelAnchor: new google.maps.Point(20, 30 * flip)
-                    labelClass: "labels"
+                    labelClass: "typhoon-time #source"
                     labelStyle: opacity: 0.75
                     opacity: 0.7
                     icon: if strong then hurricane-filled else hurricane
@@ -178,7 +178,7 @@ mod.TyphoonCtrl =
                 s.JTWCtime = issued
             $http.get("/1/typhoon/cwb").success ->
                 for t in it => let t
-                    render_typhoon2 t.name, [time: \T0, lon: t.lon, lat: t.lat]+++ t.forecasts
+                    render_typhoon2 t.name, [time: \T0, lon: t.lon, lat: t.lat]+++ t.forecasts, t.date, [], \#0000ff, \CWB
                 s.CWBtime = t.date
 
         s.setZoomMessage = (zoom) ->
