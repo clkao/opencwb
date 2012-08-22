@@ -56,6 +56,7 @@ _ = require \underscore
         data <~ cwb.fetch_typhoon!
         results <~ cwb.parse_typhoon data
         cwbcache := { results, expiry: new Date!getTime! + 10*60*1000 }
+        return @response.send JSON.stringify(results), JsonType, 200
 
     cache = {}
     @get '/1/typhoon/jtwc/:name': (p) ->
