@@ -19,6 +19,8 @@
     "mongoose": "*",
     "request": "*",
     "underscore": "*",
+    "q": "*",
+    "cheerio": "*",
     "cwbtw": "git://github.com/clkao/cwbtw.git"
   },
   "devDependencies": {
