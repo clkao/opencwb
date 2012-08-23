@@ -31,6 +31,19 @@ Typhoon = require \../lib/typhoon
 
     JsonType = { \Content-Type : 'application/json; charset=utf-8' }
 
+    cache = {}
+    cached_json = (opts, cb) -> (p) ->
+        name = opts.key
+        if opts.keyparam
+            name += ':' + p[opts.keyparam]
+        console.log name
+        if {results,expiry}? = cache[name] => if expiry > new Date!getTime!
+            return @response.send JSON.stringify(results), JsonType, 200
+        results <~ cb p
+        console.log \cachingas, name
+        cache[name] = { results, expiry: new Date!getTime! + 10*60*1000 }
+        @response.send JSON.stringify(results), JsonType, 200
+
     forecast_for = (area, cb) ~>
         Forecast.find { area, issued: @last }
             .sort \time
@@ -41,36 +54,38 @@ Typhoon = require \../lib/typhoon
         cb null, _.values cwb.cwbspec
 
     @set databag: \param
-    @get '/1/forecast/:area': (p) ->
+    @get '/1/forecast/:area': cached_json key: \forecast keyparam: \area, (p, cb) ->
         err, results <~ forecast_for p.area
-        @response.send JSON.stringify(results), JsonType, 200
+        cb results
 
     @get '/1/area': (p) ->
         err, results <~ get_area
         @response.send JSON.stringify(results), JsonType, 200
 
-    cwbcache = {}
-    @get '/1/typhoon/cwb': (p) ->
-        if {results,expiry}? = cwbcache
-            if expiry > new Date!getTime!
-                return @response.send JSON.stringify(results), JsonType, 200
+    @get '/1/typhoon/cwb': cached_json key: \_cwb_list, (p, cb) ->
         data <~ cwb.fetch_typhoon!
         results <~ cwb.parse_typhoon data
-        cwbcache := { results, expiry: new Date!getTime! + 10*60*1000 }
-        return @response.send JSON.stringify(results), JsonType, 200
+        cb results
 
-    cache = {}
-    @get '/1/typhoon/jtwc/:name': (p) ->
-        if {results,expiry}? = cache[p.name]
-            if expiry > new Date!getTime!
-                return @response.send JSON.stringify(results), JsonType, 200
+    @get '/1/typhoon/jtwc': cached_json key: \_jtwc_list, (p, cb) ->
+        console.log p
+        err, results <- Typhoon.find do
+            source: \JTWC
+            year: new Date!getFullYear!
+            issued: $gt: new Date(new Date! - 1000*86400)
+        .sort issued: -1
+        .limit 1
+        .exec
 
+        console.log err if err
+        cb results
+
+    @get '/1/typhoon/jtwc/:name': cached_json key: \jtwc keyparam: \name, (p, cb) ->
         err, results <~ Typhoon.findOne { source: \JTWC, name: p.name, year: new Date!getFullYear! }
             .sort issued: -1
             .limit 1
             .exec
-
-        cache[p.name] = { results, expiry: new Date!getTime! + 10*60*1000 }
-        @response.send JSON.stringify(results), JsonType, 200
+        console.log \got p.name
+        cb results
 
     @get '/:what': sendFile \index.html
