@@ -108,8 +108,7 @@ mod.TyphoonCtrl =
 
         render_typhoon2 = (name, paths, issued, past=[],pathColor=\#ff0000, source="") ->
             pastpath = [for node,i in past
-                [time, coor, swind] = node.split " "
-                [,lat,lon] = coor.match /(\d+)N(\d+)E/ .map (it) -> it/10
+                {time, lat,lon, swind} = node
                 strong = swind >= 65
                 flip = if i % 2 then 1 else -1
                 pos = new google.maps.LatLng lat, lon
@@ -132,7 +131,7 @@ mod.TyphoonCtrl =
                 strokeWeight: 2
                 map: s.myMap
 
-            s.myPaths.push new google.maps.Polyline do
+            s.myPaths.push fpaths = new google.maps.Polyline do
                 path: [new google.maps.LatLng(lat,lon) for {lat,lon} in paths]
                 strokeColor: pathColor
                 strokeOpacity: 0.7
@@ -143,11 +142,13 @@ mod.TyphoonCtrl =
                 pos = new google.maps.LatLng(lat,lon)
                 strong = swind >= 65
                 flip = if i % 2 then 1 else -1
+#                plat = Math.min ...paths.map (.lat)
+#                plon = Math.min ...paths.map (.lon)
                 if i == paths.length-1 => new MarkerWithLabel do
                     position: pos
                     map: s.myMap
                     labelContent: name
-                    labelAnchor: new google.maps.Point(44, 60)
+                    labelAnchor: new google.maps.Point(44,160)
                     labelClass: "typhoon-name #source"
                     icon: hicons.hurricane
                 new MarkerWithLabel do
@@ -166,9 +167,9 @@ mod.TyphoonCtrl =
         s.myPaths = []
 
         s.$watch \myMap, ->
-            for id in <[wp1612 wp1512]>
-                $http.get("/1/typhoon/jtwc/#id").success ({name,paths,issued, past})->
-                    render_typhoon name, paths, issued, past
+            for id in <[TEMBIN BOLAVEN]>
+                $http.get("/1/typhoon/jtwc/#id").success ({name,current,forecasts,issued, past})->
+                    render_typhoon2 name, [current] +++ forecasts, issued, past
                     s.JTWCtime = issued
             $http.get("/1/typhoon/cwb").success ->
                 for t in it => let t
