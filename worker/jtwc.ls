@@ -1,5 +1,5 @@
 mongoose = require \mongoose
-Typhoon = require \../lib/typhoon
+{Typhoon} = require \../lib/schema
 Q = require \q
 
 env = (try JSON.parse fs.readFileSync \environment.json, \utf8) or process.env

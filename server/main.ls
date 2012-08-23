@@ -1,26 +1,14 @@
 _ = require \underscore
-Typhoon = require \../lib/typhoon
+{Forecast,LastUpdated,Typhoon} = require \../lib/schema
 
 @include = ->
     cwb = require \cwbtw
     @use \bodyParser, @app.router, @express.static __dirname + \/../_public
 
-    Schema = @mongoose.Schema
-    ForecastSchema = new Schema do
-        issued:  Date
-        time: Date
-        area: String
-        forecast: do
-            PoP:    Number
 
-    LastUpdatedSchema = new Schema do
-        key: String
-        time: Date
     RealBin = require \path .dirname do
         require \fs .realpathSync __filename
     RealBin -= /\/server/
-    Forecast = @mongoose.model \Forecast, ForecastSchema
-    LastUpdated = @mongoose.model \LastUpdated, LastUpdatedSchema
 
     LastUpdated.findOne { key: \72hr-forecast }, (err, last) ~>
         @last = last.time
@@ -36,11 +24,9 @@ Typhoon = require \../lib/typhoon
         name = opts.key
         if opts.keyparam
             name += ':' + p[opts.keyparam]
-        console.log name
         if {results,expiry}? = cache[name] => if expiry > new Date!getTime!
             return @response.send JSON.stringify(results), JsonType, 200
         results <~ cb p
-        console.log \cachingas, name
         cache[name] = { results, expiry: new Date!getTime! + 10*60*1000 }
         @response.send JSON.stringify(results), JsonType, 200
 
@@ -68,7 +54,6 @@ Typhoon = require \../lib/typhoon
         cb results
 
     @get '/1/typhoon/jtwc': cached_json key: \_jtwc_list, (p, cb) ->
-        console.log p
         err, results <- Typhoon.find do
             source: \JTWC
             year: new Date!getFullYear!
@@ -85,7 +70,6 @@ Typhoon = require \../lib/typhoon
             .sort issued: -1
             .limit 1
             .exec
-        console.log \got p.name
         cb results
 
     @get '/:what': sendFile \index.html
