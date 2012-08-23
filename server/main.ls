@@ -54,16 +54,17 @@ _ = require \underscore
         cb results
 
     @get '/1/typhoon/jtwc': cached_json key: \_jtwc_list, (p, cb) ->
-        err, results <- Typhoon.find do
+        err, res <- Typhoon.find do
             source: \JTWC
             year: new Date!getFullYear!
             issued: $gt: new Date(new Date! - 1000*86400)
         .sort issued: -1
-        .limit 1
         .exec
 
-        console.log err if err
-        cb results
+        results = {}
+        for {name}:entry in res
+            results[name] ||= entry
+        cb _.values results
 
     @get '/1/typhoon/jtwc/:name': cached_json key: \jtwc keyparam: \name, (p, cb) ->
         err, results <~ Typhoon.findOne { source: \JTWC, name: p.name, year: new Date!getFullYear! }
