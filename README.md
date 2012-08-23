@@ -8,7 +8,8 @@ A project to provide public and open API for weather information in Taiwan.
                                   These files should not be edited directly
     app/                      --> files for building static content using brunch
 
-    src/                      --> zappajs-based server
+    lib/                      --> common library
+    server/                   --> zappajs-based server
 
 ## to start a server
 
