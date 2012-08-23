@@ -91,22 +91,7 @@ mod.TyphoonCtrl =
             new google.maps.Point(12, 12),
             new google.maps.Size(24, 24)] for i in <[hurricane hurricane-filled]>}
 
-        var render_typhoon2
-        render_typhoon = (name, paths, issued, past) ->
-            path = paths.map ->
-                [time, lat, lon, swind, ...wind] = it.split(" ")
-                lat = parseInt(lat) / 10
-                lon = parseInt(lon) / 10
-                swind = parseFloat swind
-                windr = []
-                while wind.length
-                    wr = wind.shift!
-                    [ne, ,, se ,,, sw ,,, nw ,,] = wind.splice(0, 12)map -> parseFloat it
-                    windr.push {wr,ne,se,sw,nw}
-                { time, lat, lon, swind, windr }
-            render_typhoon2 name, path, issued, past
-
-        render_typhoon2 = (name, paths, issued, past=[],pathColor=\#ff0000, source="") ->
+        render_typhoon = (name, paths, issued, past=[],pathColor=\#ff0000, source="") ->
             pastpath = [for node,i in past
                 {time, lat,lon, swind} = node
                 strong = swind >= 65
@@ -167,13 +152,13 @@ mod.TyphoonCtrl =
         s.myPaths = []
 
         s.$watch \myMap, ->
-            for id in <[TEMBIN BOLAVEN]>
-                $http.get("/1/typhoon/jtwc/#id").success ({name,current,forecasts,issued, past})->
-                    render_typhoon2 name, [current] +++ forecasts, issued, past
-                    s.JTWCtime = issued
+            $http.get("/1/typhoon/jtwc").success ->
+                for t in it => let t
+                    render_typhoon t.name, [t.current] +++ t.forecasts, t.issued, t.past,,\JTWC
+                    s.JTWCtime = new Date t.issued
             $http.get("/1/typhoon/cwb").success ->
                 for t in it => let t
-                    render_typhoon2 t.name, t.forecasts, t.date, [], \#0000ff, \CWB
+                    render_typhoon t.name, t.forecasts, t.date, [], \#0000ff, \CWB
                 s.CWBtime = t.date
 
         s.setZoomMessage = (zoom) ->
