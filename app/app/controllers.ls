@@ -144,16 +144,29 @@ mod.TyphoonCtrl =
 #                plat = Math.min ...paths.map (.lat)
 #                plon = Math.min ...paths.map (.lon)
                 if i == paths.length-1 => mk_label pos, name, source, issued
+                date = new Date(issued + (Number("#time" - /^T0+/) * 60min * 60sec * 1000ms))
+                dateString = "#{1+date.getMonth!}/#{date.getDate!} #{date.getHours!}h"
+
                 new MarkerWithLabel do
                     position: pos
                     map: s.myMap
-                    labelContent: time
+                    labelContent: dateString
                     labelAnchor: new google.maps.Point(20, 30 * flip)
                     labelClass: "typhoon-time #source"
                     labelStyle: opacity: 0.75
                     opacity: 0.7
                     icon: if strong then hicons[\hurricane-filled] else hicons.hurricane
                 windr?forEach -> render_windr it, lat, lon, pathColor
+
+        parseDate = (str) ->
+            | matched = "#str".match //^(\d\d)(\d\d)UTC\s+(\d+)\s+(\w+)\s+(\d+)//
+                [_, hh, mm, day, month, year] = matched
+                month = "#{$.inArray(month, <[ _
+                    January February March April May June July
+                    August September October November December
+                ]>)}"replace(/^(.)$/, "0$1")
+                new Date "#{year}-#{month}-#{day}T#hh:#mm:00Z"
+            | otherwise => new Date str
 
         s.myMarkers = []
         s.myCircles = []
