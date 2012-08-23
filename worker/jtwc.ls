@@ -1,6 +1,7 @@
 mongoose = require \mongoose
 {Typhoon} = require \../lib/schema
 Q = require \q
+fs = require \fs
 
 env = (try JSON.parse fs.readFileSync \environment.json, \utf8) or process.env
 mongoose.connect env.MONGOLAB_URI

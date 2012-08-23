@@ -1,5 +1,5 @@
 HTML_FILES=$(shell find app -name '*.jade' | sed s/jade/html/)
-JS_FILES=server/app.js server/main.js lib/schema.js
+JS_FILES=server/app.js server/main.js lib/schema.js worker/jtwc.js
 
 .jade.html:
 	jade --pretty $<
