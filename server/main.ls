@@ -50,7 +50,7 @@ _ = require \underscore
 
     @get '/1/typhoon/:source': cached_json keyparam: \source, key: \_list, (p, cb) ->
         err, res <- Typhoon.find do
-            source: p.source
+            source: p.source.toUpperCase!
             year: new Date!getFullYear!
             issued: $gt: new Date(new Date! - 1000*86400)
         .sort issued: -1
