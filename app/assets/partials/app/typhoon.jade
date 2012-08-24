@@ -4,7 +4,7 @@ section.typhoon(ng-controller='TyphoonCtrl')
     div(ng-repeat="path in myPaths",ui-map-marker="myPaths[$index]")
     div.map(ui-map="myMap",ui-options="mapOptions",ui-event="{'map-zoom_changed': 'setZoomMessage(myMap.getZoom())' }")
     div.legend
-        div.CWB CWB {{CWBtime}}
-        div.JTWC(ng-show='JTWCtime') JTWC {{JTWCtime}}
+        button.btn.btn-info(button-toggle="active",ng-model="show_cwb") CWB
+        button.btn.btn-info(button-toggle="active",ng-model="show_jtwc") JTWC
 
  

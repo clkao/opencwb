@@ -91,6 +91,20 @@ mod.TyphoonCtrl =
             new google.maps.Point(12, 12),
             new google.maps.Size(24, 24)] for i in <[hurricane hurricane-filled]>}
 
+
+        labels = {}
+
+        time_MDH = (t) -> (t.getMonth!+1)+'-'+(t.getDate!)+'T'+(t.getHours!)+'Z'
+        mk_label = (pos, name, source, issued) ->
+            labels[name] ||= new MarkerWithLabel do
+                position: pos
+                map: s.myMap
+                labelContent: name
+                labelAnchor: new google.maps.Point(144,30)
+                labelClass: "typhoon-name"
+                icon: hicons.hurricane
+            labels[name].labelContent = labels[name].labelContent + "<div class='issued #{source}'>#{source}: #{time_MDH(issued)}</div>"
+
         render_typhoon = (name, paths, issued, past=[],pathColor=\#ff0000, source="") ->
             pastpath = [for node,i in past
                 {time, lat,lon, swind} = node
@@ -129,13 +143,7 @@ mod.TyphoonCtrl =
                 flip = if i % 2 then 1 else -1
 #                plat = Math.min ...paths.map (.lat)
 #                plon = Math.min ...paths.map (.lon)
-                if i == paths.length-1 => new MarkerWithLabel do
-                    position: pos
-                    map: s.myMap
-                    labelContent: name
-                    labelAnchor: new google.maps.Point(44,160)
-                    labelClass: "typhoon-name #source"
-                    icon: hicons.hurricane
+                if i == paths.length-1 => mk_label pos, name, source, issued
                 new MarkerWithLabel do
                     position: pos
                     map: s.myMap
@@ -154,12 +162,12 @@ mod.TyphoonCtrl =
         s.$watch \myMap, ->
             $http.get("/1/typhoon/jtwc").success ->
                 for t in it => let t
-                    render_typhoon t.name, [t.current] +++ t.forecasts, t.issued, t.past,,\JTWC
-                    s.JTWCtime = new Date t.issued
+                    issued = new Date t.issued
+                    render_typhoon t.name, [t.current] +++ t.forecasts, issued, t.past,,\JTWC
             $http.get("/1/typhoon/cwb").success ->
                 for t in it => let t
-                    render_typhoon t.name, t.forecasts, t.date, [], \#0000ff, \CWB
-                s.CWBtime = t.date
+                    issued = new Date t.issued
+                    render_typhoon t.name, [t.current] +++ t.forecasts, issued, null,\#0000ff ,\CWB
 
         s.setZoomMessage = (zoom) ->
             s.zoom = zoom

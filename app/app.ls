@@ -1,5 +1,5 @@
 # Declare app level module which depends on filters, and services
-App = angular.module \app, <[ ngCookies ngResource app.controllers app.directives app.filters app.services ui.directives]>
+App = angular.module \app, <[ ngCookies ngResource buttonToggle app.controllers app.directives app.filters app.services ui.directives]>
 
 App.config [ '$routeProvider' '$locationProvider'
 ($routeProvider, $locationProvider, config) ->

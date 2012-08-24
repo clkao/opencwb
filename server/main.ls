@@ -48,14 +48,9 @@ _ = require \underscore
         err, results <~ get_area
         @response.send JSON.stringify(results), JsonType, 200
 
-    @get '/1/typhoon/cwb': cached_json key: \_cwb_list, (p, cb) ->
-        data <~ cwb.fetch_typhoon!
-        results <~ cwb.parse_typhoon data
-        cb results
-
-    @get '/1/typhoon/jtwc': cached_json key: \_jtwc_list, (p, cb) ->
+    @get '/1/typhoon/:source': cached_json keyparam: \source, key: \_list, (p, cb) ->
         err, res <- Typhoon.find do
-            source: \JTWC
+            source: p.source
             year: new Date!getFullYear!
             issued: $gt: new Date(new Date! - 1000*86400)
         .sort issued: -1
@@ -68,6 +63,13 @@ _ = require \underscore
 
     @get '/1/typhoon/jtwc/:name': cached_json key: \jtwc keyparam: \name, (p, cb) ->
         err, results <~ Typhoon.findOne { source: \JTWC, name: p.name, year: new Date!getFullYear! }
+            .sort issued: -1
+            .limit 1
+            .exec
+        cb results
+
+    @get '/1/typhoon/cwb/:name': cached_json key: \cwb keyparam: \name, (p, cb) ->
+        err, results <~ Typhoon.findOne { source: \CWB, name: p.name, year: new Date!getFullYear! }
             .sort issued: -1
             .limit 1
             .exec
