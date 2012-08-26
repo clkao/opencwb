@@ -17,13 +17,15 @@ make_entry = -> do
     swind: @wind * 1.943
     windr: [ { wr: 27 } <<< all_r(@r7 / 1.852) ] +++ if @r10 > 0 => [ { wr: 48 } <<< all_r(@r10 / 1.852) ] else []
 
-make_past = ->
-    @time[1]--
-    do
-        lat: parseFloat @lat
-        lon: parseFloat @lon
-        swind: @wind * 1.943
-        time: new Date(Date.UTC ...@time)
+parse_cwb_time = (args) ->
+    args[1]--
+    new Date(Date.UTC(...args)- 8hr * 3600sec * 1000ms)
+
+make_past = -> do
+    lat: parseFloat @lat
+    lon: parseFloat @lon
+    swind: @wind * 1.943
+    time: parse_cwb_time @time
 
 defers = []
 
@@ -31,9 +33,9 @@ parse_typhoon = (t) ->
     defer = Q.defer!
     defers.push defer.promise
 
-    time = t.init
-    --time[1]
-    meta = { issued: new Date(Date.UTC ...time), name: t.typhname_eng }
+    meta = do
+        issued: parse_cwb_time t.init
+        name: t.typhname_eng
 
     year = meta.issued.getFullYear!
     current = make_entry.apply t.curr
