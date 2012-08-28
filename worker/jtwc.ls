@@ -6,6 +6,14 @@ fs = require \fs
 env = (try JSON.parse fs.readFileSync \environment.json, \utf8) or process.env
 mongoose.connect env.MONGOLAB_URI
 
+parse_latlon = (str) ->
+    [,lat,ns,lon,ew]? = str.match /(\d+)([NS])\s*(\d+)([EW])/
+    lat /= 10
+    lon /= 10
+    lat *= -1 if ns == 'S'
+    lon *= -1 if ew == 'W'
+    [lat, lon]
+
 parse = (body) ->
     lines = body.split("\n")map (it) -> it - /\s*$/
     meta = {}
@@ -15,7 +23,8 @@ parse = (body) ->
         time = new Date(Date.UTC(...date[1 to 4]))
         if meta.name
             [, coor, swind] = line.split " "
-            [,lat,lon] = line.match /(\d+)N(\d+)E/ .map (it) -> it/10
+            [lat,lon] = parse_latlon(line)
+
             past.push {time, swind, lat, lon}
         else
             [,,meta.name,meta.warningId] = line.split(/\s+/)
@@ -26,9 +35,8 @@ parse = (body) ->
             paths.push line
         break if line == 'AMP'
     paths = paths.map ->
-        [time, lat, lon, swind, ...wind] = it.split(" ")
-        lat = parseInt(lat) / 10
-        lon = parseInt(lon) / 10
+        [time, lat$, lon$, swind, ...wind] = it.split(" ")
+        [lat, lon] = parse_latlon [lat$,lon$].join(" ")
         swind = parseFloat swind
         windr = []
         while wind.length
@@ -56,7 +64,8 @@ do
 #body = fs.readFileSync \/tmp/wp1512.tcw.txt, \utf8
     { meta, current, paths, past } = parse body
 
-    console.log meta
+    console.log meta, current
+    return defer.reject! unless meta.issued
     year = meta.issued.getFullYear!
     _id = "JTWC-#{meta.name}-#year-#{meta.warningId}"
     t = new Typhoon { forecasts: paths, current, past: past, issued: meta.issued, source: \JTWC, name: meta.name, year, _id }
