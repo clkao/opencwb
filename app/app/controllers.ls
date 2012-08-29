@@ -144,14 +144,15 @@ mod.TyphoonCtrl =
 #                plat = Math.min ...paths.map (.lat)
 #                plon = Math.min ...paths.map (.lon)
                 if i == paths.length-1 => mk_label pos, name, source, issued
-                date = new Date(issued + (Number("#time" - /^T0+/) * 60min * 60sec * 1000ms))
+                offset = if time => Number("#time" - /^T0*/) else 0
+                date = new Date(issued + offset * 60min * 60sec * 1000ms)
                 dateString = "#{1+date.getMonth!}/#{date.getDate!} #{date.getHours!}h"
 
                 new MarkerWithLabel do
                     position: pos
                     map: s.myMap
                     labelContent: dateString
-                    labelAnchor: new google.maps.Point(20, 30 * flip)
+                    labelAnchor: new google.maps.Point(30, 30 * flip)
                     labelClass: "typhoon-time #source"
                     labelStyle: opacity: 0.75
                     opacity: 0.7
