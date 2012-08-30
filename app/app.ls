@@ -7,7 +7,7 @@ App.config [ '$routeProvider' '$locationProvider'
     .when \/forecasts, templateUrl: \/partials/app/forecasts.html
     .when \/typhoon, templateUrl: \/partials/app/typhoon.html
     # Catch all
-    .otherwise redirectTo: \/typhoon
+    .otherwise redirectTo: \/forecasts
 
   # Without serve side support html5 must be disabled.
   $locationProvider.html5Mode true
