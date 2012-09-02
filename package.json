@@ -21,6 +21,12 @@
     "underscore": "*",
     "q": "*",
     "cheerio": "*",
+    "passport": "*",
+    "bcrypt": "*",
+    "passport-local": "*",
+    "passport-facebook": "*",
+    "passport-github": "*",
+    "passport-twitter": "*",
     "cwbtw": "git://github.com/clkao/cwbtw.git"
   },
   "devDependencies": {

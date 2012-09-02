@@ -21,7 +21,7 @@ html(lang='en')
     script(src="http://maps.google.com/maps/api/js?sensor=false")
     script(src='/js/vendor.js')
     script(src='/js/app.js')
-  body(ng-controller='OpenCWB')
+  body
       .navbar
         .navbar-inner
           .container
@@ -33,4 +33,6 @@ html(lang='en')
               a(href='/') OpenCWB
             .nav-collapse
               div(ng-include="'/partials/app/nav.html'")
+
+      div(ng-include="'/partials/app/login.html'")
       .container.main-content(ng-view)

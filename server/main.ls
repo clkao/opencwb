@@ -1,9 +1,17 @@
 _ = require \underscore
 {Forecast,LastUpdated,Typhoon} = require \../lib/schema
 
+
 @include = ->
+    @passport = require \passport
+    CookieStore = require \cookie-sessions
     cwb = require \cwbtw
-    @use \bodyParser, @app.router, @express.static __dirname + \/../_public
+    @use @express.static __dirname + \/../_public
+    @use \bodyParser
+    @use CookieStore secret: \wtf
+    @app.use @passport.initialize!
+    @app.use @passport.session!
+    @use @app.router
 
 
     RealBin = require \path .dirname do
@@ -75,4 +83,13 @@ _ = require \underscore
             .exec
         cb results
 
+    @helper ensureAuthenticated: (next) ->
+        if @request?isAuthenticated! => return next!
+        @response.send 401
+
+    @get '/1/profile': ->
+        <~ @ensureAuthenticated
+        @response.send 'ok '+@request.user.username
+
+    @include \auth
     @get '/:what': sendFile \index.html

@@ -1,5 +1,5 @@
 HTML_FILES=$(shell find app -name '*.jade' | sed s/jade/html/)
-JS_FILES=server/app.js server/main.js lib/schema.js worker/jtwc.js worker/cwb-typhoon.js
+JS_FILES=server/app.js server/main.js server/auth.js lib/schema.js lib/user.js worker/jtwc.js worker/cwb-typhoon.js
 
 .jade.html:
 	jade --pretty $<
@@ -7,10 +7,14 @@ JS_FILES=server/app.js server/main.js lib/schema.js worker/jtwc.js worker/cwb-ty
 .ls.js:
 	env PATH="$$PATH:./node_modules/LiveScript/bin" livescript -c  $<
 
-all :: $(HTML_FILES) $(JS_FILES)
+server :: $(JS_FILES)
+
+jade :: $(HTML_FILES)
+
+client :: jade
 	env PATH="$$PATH:./node_modules/brunch/bin" brunch b
 
-run :: all
+run :: server
 	node server/app.js
 
 heroku :: all

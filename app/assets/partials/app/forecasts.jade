@@ -12,6 +12,7 @@ section.area-forecast(ng-controller='AreaForecast')
         i.icon-info-sign(title='{{ area.forecasts[0] }}')
         i(ng-class="isStarred(area.zip)",ng-click="toggleStarred(area.zip)")
         i.icon-refresh(ng-click="refresh(area)")
+        i.icon-inbox(ng-click="watch(area)")
         i.icon-remove-sign(ng-click="remove(area)")
     .clear(style="clear: both")
     .forecasts.row-fluid

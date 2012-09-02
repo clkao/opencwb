@@ -59,6 +59,7 @@ mod.AreaForecast = [ '$scope', 'forecasts'
   s.resetAll = forecasts.resetAll
   s.refresh = forecasts.refresh
   s.remove = forecasts.remove
+  s.watch = forecasts.watch
 
   if navigator.geolocation
     {{latitude,longitude}:coords} <- navigator.geolocation.getCurrentPosition
@@ -66,6 +67,29 @@ mod.AreaForecast = [ '$scope', 'forecasts'
     result, status <- geocoder.geocode {latLng: new google.maps.LatLng latitude,longitude } 
     forecasts.setCurrent result[3]address_components[0]short_name
 ]
+
+mod.LoginController = <[ $scope $http authService ]> +++ ($scope, $http, authService) ->
+    $scope.$on 'event:auth-loginRequired', ->
+      $scope.loginShown = true
+    $scope.$on 'event:auth-loginConfirmed', ->
+      $scope.loginShown = false
+
+    window.addEventListener 'message', ({data}) ->
+        <- $scope.$apply
+        if data.auth
+            $scope.message = ''
+            authService.loginConfirmed!
+        if data.authFailed
+            $scope.message = data.message || 'login failed'
+
+    $scope.message = ''
+    $scope.submit = ->
+        $http.post('auth/login', email: $scope.email, password: $scope.password )
+        .success ->
+            $scope.message = ''
+            authService.loginConfirmed!
+        .error ->
+            $scope.message = if typeof it is \object => it.message else it
 
 mod.TyphoonCtrl = 
     * '$scope'
@@ -199,4 +223,4 @@ mod.TyphoonCtrl =
           zoom: 6
           mapTypeId: google.maps.MapTypeId.ROADMAP
 
-angular.module('app.controllers', []).controller(mod)
+angular.module('app.controllers', ['http-auth-interceptor']).controller(mod)

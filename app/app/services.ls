@@ -40,7 +40,6 @@ mod.forecasts = ['$http', 'store', '$rootScope', ($http, store, $rootScope) ->
             forecasts.all[area.zip]dirty = true
             forecasts.addForecast area
         remove: (area) ->
-            console.log \removing, area.zip
             delete forecasts._current[area.zip]
             forecasts.current .= filter -> it.zip != area.zip
         isStarred: (zip) ->
@@ -56,6 +55,8 @@ mod.forecasts = ['$http', 'store', '$rootScope', ($http, store, $rootScope) ->
             forecasts.starred = config?starred || {}
             for a in areas when forecasts.starred[a.zip] => forecasts.addForecast a
             forecasts.areas = areas
+        watch: (area) ->
+            $http.get(\/1/profile).success ->
     }
 
     $http.get(\/1/area).success ->

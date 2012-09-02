@@ -14,6 +14,9 @@ console.log "Please connect to: http://#{
 
 @mongoose = require \mongoose
 @mongoose.connect json?MONGOLAB_URI ? process.env?MONGOLAB_URI ? \mongodb://localhost/cwbtw
+@config = json ? {}
+@config.cookieSecret ?= 'its-secret'
+@config.authproviders ?= {}
 
 @include \main
 
