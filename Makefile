@@ -17,7 +17,7 @@ client :: jade
 run :: server
 	node server/app.js
 
-heroku :: all
+heroku :: server
 	rm -rf _public && git checkout heroku && git merge master && scripts/compile-jade.sh && brunch b -m && git add -A -f server lib _public && git commit -m 'regen' && git push heroku heroku:master -f && git checkout master
 
 .SUFFIXES: .jade .html .ls .js
