@@ -8,7 +8,9 @@ _ = require \underscore
     cwb = require \cwbtw
     @use @express.static __dirname + \/../_public
     @use \bodyParser
-    @use CookieStore secret: \wtf
+    @use CookieStore secret: @config.cookieSecret, onError: ->
+        console.log it
+        return {}
     @app.use @passport.initialize!
     @app.use @passport.session!
     @use @app.router

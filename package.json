@@ -23,6 +23,8 @@
     "cheerio": "*",
     "passport": "*",
     "bcrypt": "*",
+    "jade": "*",
+    "cookie-sessions": "git://github.com/clkao/cookie-sessions.git",
     "passport-local": "*",
     "passport-facebook": "*",
     "passport-github": "*",
