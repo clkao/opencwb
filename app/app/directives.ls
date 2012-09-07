@@ -5,13 +5,13 @@ mod = {}
 
 # module for using css-toggle buttons instead of checkboxes
 # toggles the class named in button-toggle element if value is checked
-angular.module(\buttonToggle []).directive \buttonToggle -> do
-        restrict: 'A',
-        require: 'ngModel',
+angular.module(\buttonToggle [])directive \buttonToggle -> do
+        restrict: 'A'
+        require: 'ngModel'
         link: ($scope, element, attr, ctrl) ->
-            classToToggle = attr.buttonToggle;
-            element.bind 'click', ->
-                checked = ctrl.$viewValue;
+            classToToggle = attr.buttonToggle
+            element.bind 'click' ->
+                checked = ctrl.$viewValue
                 $scope.$apply (scope) -> ctrl.$setViewValue(!checked)
 
             $scope.$watch attr.ngModel, (newValue, oldValue) ->

@@ -9,18 +9,18 @@ mod.store = ->
     new Lawnchair {
         adapter: \dom
         name: \starred
-    }, -> it
+    } -> it
 
-mod.forecasts = ['$http', 'store', '$rootScope', ($http, store, $rootScope) ->
+mod.forecasts = <[$http store $rootScope]> +++ ($http, store, $rootScope) ->
     var splicer
-    forecasts = {
+    forecasts =
         current: []
         _current: {}
         starred: {}
         all: {}
         addForecast: (area) -> 
             if !forecasts.all[area.zip] || forecasts.all[area.zip]dirty
-                forecasts.all[area.zip] ||= {} <<< area;
+                forecasts.all@[area.zip] <<< area;
                 forecasts.all[area.zip]loading = true
                 $http.get("/1/forecast/#{area.zip}").success ->
                     forecasts.all[area.zip] = forecasts.all[area.zip] <<< forecasts: it
@@ -57,17 +57,16 @@ mod.forecasts = ['$http', 'store', '$rootScope', ($http, store, $rootScope) ->
             forecasts.areas = areas
         watch: (area) ->
             $http.get(\/1/profile).success ->
-    }
 
-    $http.get(\/1/area).success ->
+    $http.get(\/1/area)success ->
         forecasts.areas = it
-        forecasts.init(it)
-        $rootScope.$emit \area-list, it
+        forecasts.init it
+        $rootScope.$emit \area-list it
 
     splicer = ->
         now = new Date!
         for zip,{forecasts:f}:area of forecasts.all => let f, area
-            if new Date(f[0].time).getTime! < now.getTime! - 2400 * 3000
+            if new Date(f.0.time)getTime! < now.getTime! - 2400 * 3000
                 f.shift!
                 area.dateCols = null
 
@@ -80,6 +79,5 @@ mod.forecasts = ['$http', 'store', '$rootScope', ($http, store, $rootScope) ->
     runner (15 - new Date!getMinutes!) %% 60 * 60
 
     forecasts
-]
 
-angular.module('app.services', []).factory(mod)
+angular.module('app.services' [])factory(mod)
