@@ -116,7 +116,7 @@ mod.TyphoonCtrl =
                 labelAnchor: new google.maps.Point(144,30)
                 labelClass: "typhoon-name"
                 icon: hicons.hurricane
-            labels[name]labelContent + "<div class='issued #{source}'>#{source}: #{time_MDH(issued)}</div>"
+            labels[name]labelContent += "<div class='issued #{source}'>#{source}: #{time_MDH(issued)}</div>"
 
         render_typhoon = (name, paths, issued, past=[],pathColor=\#ff0000, source="") ->
             pastpath = [for {time, lat,lon, swind}, i in past
