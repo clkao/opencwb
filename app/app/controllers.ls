@@ -1,34 +1,29 @@
 mod = {}
 
-mod.OpenCWB = [ \$scope \$location \$resource \$rootScope \forecasts
-(s, $location, $resource, $rootScope, forecasts) ->
+mod.OpenCWB = <[$scope $location $resource $rootScope forecasts]> +++ (s, $location, $resource, $rootScope, forecasts) ->
 
   s.$location = $location
-  s.$watch('$location.path()', (path) ->
-    s.activeNavId = path || '/'
-  )
+  s.$watch '$location.path()' (path = '/') -> s.activeNavId = path
 
   s.getClass = (id) ->
-    if s.activeNavId.substring(0, id.length) == id
-      return 'active'
+    if s.activeNavId.substring 0, id.length is id
+      'active'
     else
-      return ''
-  $rootScope.$on \area-list, (, it) ->
+      ''
+  $rootScope.$on \area-list (, it) ->
       s.areas = it
 
   s.$watch 'currentArea', (newV, oldV)->
       forecasts.addForecast newV if newV
-]
 
-mod.AreaSelect = [ '$scope' '$http' 'forecasts', '$rootScope' (s, $http, forecasts, $rootScope) ->
-  s.$watch 'currentArea', (newV, oldV)->
+
+mod.AreaSelect = <[$scope $http forecasts $rootScope]> +++ (s, $http, forecasts, $rootScope) ->
+  s.$watch 'currentArea' (newV, oldV)->
       if newV => for a in newV => forecasts.addForecast a
-  $rootScope.$on \area-list, (, it) ->
+  $rootScope.$on \area-list (, it) ->
       s.areas = it
-]
 
-mod.AreaForecast = [ '$scope', 'forecasts'
-(s, forecasts) ->
+mod.AreaForecast = <[$scope forecasts]> +++ (s, forecasts) ->
   s.forecasts = forecasts
   s.getDate = (t) ->
       d = new Date t
@@ -42,8 +37,8 @@ mod.AreaForecast = [ '$scope', 'forecasts'
   s.getWindStyle = (windlevel) -> do
       opacity: if windlevel <= 1 then 0.3 else if windlevel < 3 then 0.6 else 1
   s.getWeatherStyle = (t,f) ->
-      [,icon] = f.WeatherIcon.match /Weather(\d+).bmp/;
-      what = dayOrNight(s.getTime t)
+      [,icon] = f.WeatherIcon.match /Weather(\d+).bmp/
+      what = dayOrNight s.getTime t
       {background-image: "url('http://www.cwb.gov.tw/township/enhtml/pic/#{what}pic/#{what}_#icon.png')"}
   s.getDayOrNight = (t) ->
       h = s.getTime t
@@ -54,27 +49,21 @@ mod.AreaForecast = [ '$scope', 'forecasts'
       return [] unless f?
       area.dateCols ||= _.groupBy(f, ({time}) -> s.getDate(time))
 
-  s.isStarred = forecasts.isStarred
-  s.toggleStarred = forecasts.toggleStarred
-  s.resetAll = forecasts.resetAll
-  s.refresh = forecasts.refresh
-  s.remove = forecasts.remove
-  s.watch = forecasts.watch
+  s <<< forecasts{isStarred, toggleStarred, resetAll, refresh, remove, watch}
 
   if navigator.geolocation
     {{latitude,longitude}:coords} <- navigator.geolocation.getCurrentPosition
-    geocoder = new google.maps.Geocoder();
-    result, status <- geocoder.geocode {latLng: new google.maps.LatLng latitude,longitude } 
-    forecasts.setCurrent result[3]address_components[0]short_name
-]
+    geocoder = new google.maps.Geocoder!
+    result, status <- geocoder.geocode {latLng: new google.maps.LatLng latitude, longitude } 
+    forecasts.setCurrent result.3.address_components.0.short_name
 
 mod.LoginController = <[ $scope $http authService ]> +++ ($scope, $http, authService) ->
-    $scope.$on 'event:auth-loginRequired', ->
+    $scope.$on 'event:auth-loginRequired' ->
       $scope.loginShown = true
-    $scope.$on 'event:auth-loginConfirmed', ->
+    $scope.$on 'event:auth-loginConfirmed' ->
       $scope.loginShown = false
 
-    window.addEventListener 'message', ({data}) ->
+    window.addEventListener 'message' ({data}) ->
         <- $scope.$apply
         if data.auth
             $scope.message = ''
@@ -84,7 +73,7 @@ mod.LoginController = <[ $scope $http authService ]> +++ ($scope, $http, authSer
 
     $scope.message = ''
     $scope.submit = ->
-        $http.post('auth/login', email: $scope.email, password: $scope.password )
+        $http.post 'auth/login' $scope{email, password}
         .success ->
             $scope.message = ''
             authService.loginConfirmed!
@@ -111,9 +100,9 @@ mod.TyphoonCtrl =
                 fillOpacity: 0.1
 
         hicons = {[i, new google.maps.MarkerImage "/img/#i.png", null,
-            new google.maps.Point(0,0),
-            new google.maps.Point(12, 12),
-            new google.maps.Size(24, 24)] for i in <[hurricane hurricane-filled]>}
+            new google.maps.Point 0 0
+            new google.maps.Point 12 12
+            new google.maps.Size 24 24] for i in <[hurricane hurricane-filled]>}
 
 
         labels = {}
@@ -127,11 +116,10 @@ mod.TyphoonCtrl =
                 labelAnchor: new google.maps.Point(144,30)
                 labelClass: "typhoon-name"
                 icon: hicons.hurricane
-            labels[name].labelContent = labels[name].labelContent + "<div class='issued #{source}'>#{source}: #{time_MDH(issued)}</div>"
+            labels[name]labelContent + "<div class='issued #{source}'>#{source}: #{time_MDH(issued)}</div>"
 
         render_typhoon = (name, paths, issued, past=[],pathColor=\#ff0000, source="") ->
-            pastpath = [for node,i in past
-                {time, lat,lon, swind} = node
+            pastpath = [for {time, lat,lon, swind}, i in past
                 strong = swind >= 65
                 flip = if i % 2 then 1 else -1
                 pos = new google.maps.LatLng lat, lon
@@ -162,12 +150,12 @@ mod.TyphoonCtrl =
                 map: s.myMap
 
             for {time,swind,lat,lon,windr},i in paths
-                pos = new google.maps.LatLng(lat,lon)
+                pos = new google.maps.LatLng lat,lon
                 strong = swind >= 65
                 flip = if i % 2 then 1 else -1
 #                plat = Math.min ...paths.map (.lat)
 #                plon = Math.min ...paths.map (.lon)
-                if i == paths.length-1 => mk_label pos, name, source, issued
+                if i is paths.length-1 => mk_label pos, name, source, issued
                 offset = if time => Number("#time" - /^T0*/) else 0
                 date = new Date(issued + offset * 60min * 60sec * 1000ms)
                 dateString = "#{1+date.getMonth!}/#{date.getDate!} #{date.getHours!}h"
@@ -184,8 +172,8 @@ mod.TyphoonCtrl =
                 windr?forEach -> render_windr it, lat, lon, pathColor
 
         parseDate = (str) ->
-            | matched = "#str".match //^(\d\d)(\d\d)UTC\s+(\d+)\s+(\w+)\s+(\d+)//
-                [_, hh, mm, day, month, year] = matched
+            | "#str".match //^(\d\d)(\d\d)UTC\s+(\d+)\s+(\w+)\s+(\d+)//
+                [_, hh, mm, day, month, year] = that
                 month = "#{$.inArray(month, <[ _
                     January February March April May June July
                     August September October November December
@@ -198,14 +186,14 @@ mod.TyphoonCtrl =
         s.myPaths = []
 
         s.$watch \myMap, ->
-            $http.get("/1/typhoon/jtwc").success ->
+            $http.get("/1/typhoon/jtwc")success ->
                 for t in it => let t
                     issued = new Date t.issued
-                    render_typhoon t.name, [t.current] +++ t.forecasts, issued, t.past,,\JTWC
-            $http.get("/1/typhoon/cwb").success ->
+                    render_typhoon t.name, t['current' ...'forecasts'], issued, t.past,,\JTWC
+            $http.get("/1/typhoon/cwb")success ->
                 for t in it => let t
                     issued = new Date t.issued
-                    render_typhoon t.name, [t.current] +++ t.forecasts, issued, null,\#0000ff ,\CWB
+                    render_typhoon t.name, t['current' ...'forecasts'], issued, null,\#0000ff ,\CWB
 
         s.setZoomMessage = (zoom) ->
             s.zoom = zoom
@@ -223,4 +211,4 @@ mod.TyphoonCtrl =
           zoom: 6
           mapTypeId: google.maps.MapTypeId.ROADMAP
 
-angular.module('app.controllers', ['http-auth-interceptor']).controller(mod)
+angular.module('app.controllers', ['http-auth-interceptor'])controller(mod)
