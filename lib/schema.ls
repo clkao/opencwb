@@ -13,7 +13,7 @@ s =
         key: String
         time: Date
 
-    s.TyphoonSchema: Schema do
+    TyphoonSchema: Schema do
         _id: String
         issued:  Date
         source: String
