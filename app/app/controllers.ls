@@ -157,7 +157,7 @@ mod.TyphoonCtrl =
 #                plon = Math.min ...paths.map (.lon)
                 if i is paths.length-1 => mk_label pos, name, source, issued
                 offset = if time => Number("#time" - /^T0*/) else 0
-                date = new Date(issued + offset * 60min * 60sec * 1000ms)
+                date = new Date(issued.getTime! + offset * 60min * 60sec * 1000ms)
                 dateString = "#{1+date.getMonth!}/#{date.getDate!} #{date.getHours!}h"
 
                 new MarkerWithLabel do
@@ -170,16 +170,6 @@ mod.TyphoonCtrl =
                     opacity: 0.7
                     icon: if strong then hicons[\hurricane-filled] else hicons.hurricane
                 windr?forEach -> render_windr it, lat, lon, pathColor
-
-        parseDate = (str) ->
-            | "#str".match //^(\d\d)(\d\d)UTC\s+(\d+)\s+(\w+)\s+(\d+)//
-                [_, hh, mm, day, month, year] = that
-                month = "#{$.inArray(month, <[ _
-                    January February March April May June July
-                    August September October November December
-                ]>)}"replace(/^(.)$/, "0$1")
-                new Date "#{year}-#{month}-#{day}T#hh:#mm:00Z"
-            | otherwise => new Date str
 
         s.myMarkers = []
         s.myCircles = []
